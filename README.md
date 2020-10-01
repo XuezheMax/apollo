@@ -3,7 +3,7 @@
 <h1 align="center">Apollo</h1>
 <h5 align="center">Apollo: An Adaptive Parameter-wise Diagonal Quasi-Newton Method for Nonconvex Stochastic Optimization</h5>
 
-This is the Pytorch implementation for [Apollo: An Adaptive Parameter-wise DIAgonal Quasi-Newton Method for Nonconvex Stochastic Optimization](https://arxiv.org/abs/2009.13586)
+This is the Pytorch implementation for [Apollo: An Adaptive Parameter-wise Diagonal Quasi-Newton Method for Nonconvex Stochastic Optimization](https://arxiv.org/abs/2009.13586)
 
 ## Requirements
 * Python >= 3.6
