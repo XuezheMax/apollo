@@ -39,3 +39,14 @@ This is the Pytorch implementation for [Apollo: An Adaptive Parameter-wise DIAgo
 
 For the model training of image classification, please go this [folder](https://github.com/XuezheMax/apollo/tree/master/classification)
 
+### Language Modeling
+<img src="./docs/images/language_model.png" width="1000"/>
+
+| Method     |  Test PPL        |
+| :--------- | :--------------: |
+| Adam       |  36.68 (0.21)    |
+| RAdam      |  36.20 (0.38)    |
+| **Apollo** | **32.21 (0.13)** |
+
+For the model training of language modeling, please go this [folder](https://github.com/XuezheMax/apollo/tree/master/language_model)
+
