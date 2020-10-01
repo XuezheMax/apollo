@@ -25,7 +25,7 @@ This is the Pytorch implementation for [Apollo: An Adaptive Parameter-wise DIAgo
 ## Experimental Results
 
 ### Image Classification
-<img src="./docs/images/classify.png" width="600"/>
+<img src="./docs/images/classify.png" width="800"/>
 
 | Method     |  CIFAR-10 (%)      |  CIFAR-10 (%)      |  ImageNet (%)      |  ImageNet (%)      |
 | :--------- | :----------------: | :----------------: | :----------------: | :----------------: |
