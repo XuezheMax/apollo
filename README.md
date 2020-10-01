@@ -37,7 +37,7 @@ This is the Pytorch implementation for [Apollo: An Adaptive Parameter-wise DIAgo
 | RAdam-adj  |  93.88 (0.11)      |  94.38 (0.25)      |  76.91 (0.07)      |  77.68 (0.08)      |
 | **Apollo** |  **94.20 (0.12)**  |  **94.60 (0.06)**  |  **77.90 (0.06)**  |  **78.54 (0.09)**  |
 
-For the model training of image classification, please go this [folder](https://github.com/XuezheMax/apollo/tree/master/classification)
+For the model training of image classification, please go to this [folder](https://github.com/XuezheMax/apollo/tree/master/classification).
 
 ### Language Modeling
 <img src="./docs/images/language_model.png" width="1000"/>
@@ -48,5 +48,14 @@ For the model training of image classification, please go this [folder](https://
 | RAdam      |  36.20 (0.38)    |
 | **Apollo** | **32.21 (0.13)** |
 
-For the model training of language modeling, please go this [folder](https://github.com/XuezheMax/apollo/tree/master/language_model)
+For the model training of language modeling, please go to this [folder](https://github.com/XuezheMax/apollo/tree/master/language_model).
 
+### Neural Machine Translation
+
+| Method     |  Test BLEU       |
+| :--------- | :--------------: |
+| Adam       |  27.83 (0.06)    |
+| RAdam      |  28.11 (0.17)    |
+| **Apollo** | **28.32 (0.12)** |
+
+For the details of NMT experiments, please go to this [repo]().
