@@ -4,6 +4,11 @@ This folder is modified based on the pytorch classification project [original re
 
 For all experiments, the recommended random seeds are in {1, 101, 8191, 65537, 131071, 524287, 6700417}.
 
+## Table of Contents
+
+- [CIFAR-10](#cifar-10-experiments)
+- [ImageNet](#imagenet-experiments)
+
 ## CIFAR-10 Experiments
 ### SGD
 #### milestone decay
