@@ -9,6 +9,7 @@ This is the Pytorch implementation for [Apollo: An Adaptive Parameter-wise Diago
 
 - [Requirements](#requirements)
 - [Installation](#installation)
+- [Notes](#notes)
 - [Experiments](#experimental-results)
 
 ## Requirements
@@ -23,6 +24,9 @@ This is the Pytorch implementation for [Apollo: An Adaptive Parameter-wise Diago
 ## Installation
 1. Install [NVIDIA-apex](https://github.com/NVIDIA/apex).
 2. Install [Pytorch and torchvision](https://pytorch.org/get-started/locally/)
+
+## Notes
+The ranges of hyper parameters of Apollo, such as learning rate, are very different with Adam (see the appendix of the paper for details). To apply Apollo to your tasks, a reasonable set of hyper parameters to begin with is ```lr=1.0, eps=1e-4, init_lr=0.01, warmup=100```.
 
 ## Experimental Results
 
