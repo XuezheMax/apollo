@@ -53,25 +53,25 @@ For the model training of image classification, please go to this [folder](https
 
 #### ResNet-110 on CIFAR-10
 
-|  Method    |    lr    |  weight decay  |  decoupled weight decay |  warmup updates  |  init_lr  |
-| :--------- | :----- : | :------------: | :---------------------: | :--------------: | :-------: |
-|  SGD       |   0.1    |      5e-4      |         False           |        0         |     NA    |
-|  Adam      |   0.001  |      5e-4      |         True            |        0         |     NA    |
-|  RAdam     |   0.001  |      5e-4      |         True            |        0         |     NA    |
-|  Adam-adj  |   0.001  |      2.5e-1    |         True            |        0         |     NA    |
-|  RAdam-adj |   0.001  |      2.5e-1    |         True            |        0         |     NA    |
-|  Apollo    |   0.5    |      5e-4      |         False           |       100        |    0.01   |
+|  Method    |    lr      |  weight decay  |  decoupled weight decay |  warmup updates  |  init_lr  |
+| :--------- | :--------: | :------------: | :---------------------: | :--------------: | :-------: |
+|  SGD       |   0.1      |      5e-4      |         False           |        0         |     NA    |
+|  Adam      |   0.001    |      5e-4      |         True            |        0         |     NA    |
+|  RAdam     |   0.001    |      5e-4      |         True            |        0         |     NA    |
+|  Adam-adj  |   0.001    |      2.5e-1    |         True            |        0         |     NA    |
+|  RAdam-adj |   0.001    |      2.5e-1    |         True            |        0         |     NA    |
+|  Apollo    |   0.5      |      5e-4      |         False           |       100        |    0.01   |
 
 #### ResNext-50 on ImageNet
 
-|  Method    |    lr    |  weight decay  |  decoupled weight decay |  warmup updates  |  init_lr  |
-| :--------- | :----- : | :------------: | :---------------------: | :--------------: | :-------: |
-|  SGD       |   0.1    |      2e-4      |         False           |        0         |     NA    |
-|  Adam      |   0.001  |      2e-4      |         True            |        0         |     NA    |
-|  RAdam     |   0.001  |      2e-4      |         True            |        0         |     NA    |
-|  Adam-adj  |   0.001  |      1e-1      |         True            |        0         |     NA    |
-|  RAdam-adj |   0.001  |      1e-1      |         True            |        0         |     NA    |
-|  Apollo    |   0.5    |      2e-4      |         False           |       100        |    0.01   |
+|  Method    |    lr      |  weight decay  |  decoupled weight decay |  warmup updates  |  init_lr  |
+| :--------- | :--------: | :------------: | :---------------------: | :--------------: | :-------: |
+|  SGD       |   0.1      |      2e-4      |         False           |        0         |     NA    |
+|  Adam      |   0.001    |      2e-4      |         True            |        0         |     NA    |
+|  RAdam     |   0.001    |      2e-4      |         True            |        0         |     NA    |
+|  Adam-adj  |   0.001    |      1e-1      |         True            |        0         |     NA    |
+|  RAdam-adj |   0.001    |      1e-1      |         True            |        0         |     NA    |
+|  Apollo    |   0.5      |      2e-4      |         False           |       100        |    0.01   |
 
 ### Language Modeling
 <img src="./docs/images/language_model.png" width="1000"/>
@@ -88,11 +88,11 @@ For the model training of language modeling, please go to this [folder](https://
 
 **2-layer LSTM on One Billion Words**
 
-|  Method    |    lr    |  weight decay  |  decoupled weight decay |  warmup updates  |  init_lr  |  gradient clip  |
-| :--------- | :----- : | :------------: | :---------------------: | :--------------: | :-------: | :-------------: |
-|  Adam      |   0.001  |      0         |         True            |        0         |     NA    |      1.0        |
-|  RAdam     |   0.001  |      0         |         True            |        0         |     NA    |      1.0        |
-|  Apollo    |   10.0   |      0         |         False           |       400        |    0.01   |      1.0        |
+|  Method    |    lr      |  weight decay  |  decoupled weight decay |  warmup updates  |  init_lr  |  gradient clip  |
+| :--------- | :--------: | :------------: | :---------------------: | :--------------: | :-------: | :-------------: |
+|  Adam      |   0.001    |      0         |         True            |        0         |     NA    |      1.0        |
+|  RAdam     |   0.001    |      0         |         True            |        0         |     NA    |      1.0        |
+|  Apollo    |   10.0     |      0         |         False           |       400        |    0.01   |      1.0        |
 
 ### Neural Machine Translation
 
