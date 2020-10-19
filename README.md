@@ -51,7 +51,7 @@ ResNet-110 is much smaller than ResNet-18, with ```1.73M``` parameters (ResNet-1
 The following table summarizes the key hyper-parameters for different optimizers. 
 For the model training of image classification, please go to this [folder](https://github.com/XuezheMax/apollo/tree/master/classification).
 
-#### ResNet-110 on CIFAR-10
+**ResNet-110 on CIFAR-10**
 
 |  Method    |    lr      |  weight decay  |  decoupled weight decay |  warmup updates  |  init_lr  |
 | :--------- | :--------: | :------------: | :---------------------: | :--------------: | :-------: |
@@ -62,7 +62,7 @@ For the model training of image classification, please go to this [folder](https
 |  RAdam-adj |   0.001    |      2.5e-1    |         True            |        0         |     NA    |
 |  Apollo    |   0.5      |      5e-4      |         False           |       100        |    0.01   |
 
-#### ResNext-50 on ImageNet
+**ResNext-50 on ImageNet**
 
 |  Method    |    lr      |  weight decay  |  decoupled weight decay |  warmup updates  |  init_lr  |
 | :--------- | :--------: | :------------: | :---------------------: | :--------------: | :-------: |
@@ -72,6 +72,9 @@ For the model training of image classification, please go to this [folder](https
 |  Adam-adj  |   0.001    |      1e-1      |         True            |        0         |     NA    |
 |  RAdam-adj |   0.001    |      1e-1      |         True            |        0         |     NA    |
 |  Apollo    |   0.5      |      2e-4      |         False           |       100        |    0.01   |
+
+Note that decoupled weight decay is applied to both Adam and RAdam. 
+To adjust the weight decay rates of Adam and RAdam, we multiply the original rate with ```500```, which is the ratio of ```lr_apollo / lr_adam```.
 
 ### Language Modeling
 <img src="./docs/images/language_model.png" width="1000"/>
@@ -93,6 +96,8 @@ For the model training of language modeling, please go to this [folder](https://
 |  Adam      |   0.001    |      0         |         True            |        0         |     NA    |      1.0        |
 |  RAdam     |   0.001    |      0         |         True            |        0         |     NA    |      1.0        |
 |  Apollo    |   10.0     |      0         |         False           |       400        |    0.01   |      1.0        |
+
+Since the weight decay rate is zero for all the optimizers, there is no difference of decoupled weight decay.
 
 ### Neural Machine Translation
 
