@@ -51,7 +51,7 @@ ResNet-110 is much smaller than ResNet-18, with ```1.73M``` parameters (ResNet-1
 The following table summarizes the key hyper-parameters for different optimizers. 
 For the model training of image classification, please go to this [folder](https://github.com/XuezheMax/apollo/tree/master/classification).
 
-**ResNet-110 on CIFAR-10**
+#### ResNet-110 on CIFAR-10
 
 |  Method    |    lr    |  weight decay  |  decoupled weight decay |  warmup updates  |  init_lr  |
 | :--------- | :----- : | :------------: | :---------------------: | :--------------: | :-------: |
@@ -62,7 +62,7 @@ For the model training of image classification, please go to this [folder](https
 |  RAdam-adj |   0.001  |      2.5e-1    |         True            |        0         |     NA    |
 |  Apollo    |   0.5    |      5e-4      |         False           |       100        |    0.01   |
 
-**ResNext-50 on ImageNet**
+#### ResNext-50 on ImageNet
 
 |  Method    |    lr    |  weight decay  |  decoupled weight decay |  warmup updates  |  init_lr  |
 | :--------- | :----- : | :------------: | :---------------------: | :--------------: | :-------: |
@@ -97,7 +97,7 @@ For the model training of language modeling, please go to this [folder](https://
 ### Neural Machine Translation
 
 | Method     |  Test BLEU       |
-| :--------- | :--------------: |
+| :--------  |  :-------------: |
 | Adam       |  27.83 (0.06)    |
 | RAdam      |  28.11 (0.17)    |
 | **Apollo** | **28.32 (0.12)** |
