@@ -123,4 +123,4 @@ For Adam and RAdam, since we used the decoupled version of `weight decay` (i.e.,
 - We analyzed the effect of different `weight decay rates` on different optimizers. 
 As illustrated in the figure, Apollo achieves improvements over all the three baselines on convergence speed with different rates of weight decay
 
-<img src="./docs/images/cifar10_wd.png" width="1500"/>
+<img src="./docs/images/cifar10_wd.png" width="2000"/>
