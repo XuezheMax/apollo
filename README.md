@@ -27,7 +27,8 @@ This is the Pytorch implementation for [Apollo: An Adaptive Parameter-wise Diago
 2. Install [Pytorch and torchvision](https://pytorch.org/get-started/locally/)
 
 ## Notes
-The ranges of hyper parameters of Apollo, such as learning rate, are very different with Adam (see the appendix of the paper for details). To apply Apollo to your tasks, a reasonable set of hyper parameters to begin with is ```lr=1.0, eps=1e-4, init_lr=0.01, warmup=100```.
+- The ranges of hyper parameters of Apollo, such as learning rate, are very different with Adam (see the appendix of the paper for details). To apply Apollo to your tasks, a reasonable set of hyper parameters to begin with is ```lr=1.0, eps=1e-4, init_lr=0.01, warmup=100```.
+- Warmup plays a super important role for Apollo. Please set warmup to at least `100` updates to achieve stable convergence.
 
 ## Experimental Results
 
@@ -110,3 +111,16 @@ Since the weight decay rate is zero for all the optimizers, there is no differen
 For the details of NMT experiments, please go to this [repo]().
 
 ## Discussion
+**1. Weight Decay:**
+
+- The strength of `weight decay` has significant impact on both the performance of convergence speed and generalization accuracy.
+Moreover, different implementations of `weight decay`, such as the decoupled version, lead to very different regularization strength with the same `weight decay rate`.
+Thus, as discussed in the paper, we suggest to consider the effect of regularization strength when we analyze the performance of different optimization methods.
+
+- In this paper, for fair comparison, we use the same `weight decay rate` for SGD and Apollo in the image classification task, since they use the same implementation of `weight decay`.
+For Adam and RAdam, since we used the decoupled version of `weight decay` (i.e., we actually used AdamW and RAdamW), we adjusted the `weight decay rate` so that they have similar strength of regularization. 
+
+- We analyzed the effect of different `weight decay rates` on different optimizers. 
+As illustrated in the figure, Apollo achieves improvements over all the three baselines on convergence speed with different rates of weight decay
+
+<img src="./docs/images/cifar10_wd.png" width="1000"/>
