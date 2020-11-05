@@ -9,15 +9,35 @@ import torch
 class EvalDataset(object):
 
     def __init__(self, dataset, sequence_length):
+        """
+        Initialize dataset.
+
+        Args:
+            self: (todo): write your description
+            dataset: (todo): write your description
+            sequence_length: (int): write your description
+        """
         super(EvalDataset, self).__init__()
         self.dataset = dataset
         self.sequence_length = sequence_length
         self.construct_index()
 
     def get_tqdm(self):
+        """
+        Return the tqdm interval
+
+        Args:
+            self: (todo): write your description
+        """
         return tqdm(self, mininterval=2, total=self.index_length, leave=False, file=sys.stdout, ncols=80)
 
     def construct_index(self):
+        """
+        Construct a tensor.
+
+        Args:
+            self: (todo): write your description
+        """
         token_per_batch = self.sequence_length
         tot_num = len(self.dataset) - 1
         res_num = tot_num - tot_num % token_per_batch
@@ -32,9 +52,21 @@ class EvalDataset(object):
         self.cur_idx = 0
 
     def __iter__(self):
+        """
+        Returns an iterator over the iterable.
+
+        Args:
+            self: (todo): write your description
+        """
         return self
 
     def __next__(self):
+        """
+        Return the next word.
+
+        Args:
+            self: (todo): write your description
+        """
         if self.cur_idx == self.index_length:
             self.cur_idx = 0
             raise StopIteration
@@ -50,6 +82,16 @@ class EvalDataset(object):
 class LargeDataset(object):
 
     def __init__(self, root, range_idx, batch_size, sequence_length):
+        """
+        Initialize the batch.
+
+        Args:
+            self: (todo): write your description
+            root: (str): write your description
+            range_idx: (str): write your description
+            batch_size: (int): write your description
+            sequence_length: (int): write your description
+        """
         super(LargeDataset, self).__init__()
         self.root = root
         self.range_idx = range_idx
@@ -63,9 +105,21 @@ class LargeDataset(object):
         self.batch_count = 0
 
     def shuffle(self):
+        """
+        Shuffle the list of the elements.
+
+        Args:
+            self: (todo): write your description
+        """
         np.random.shuffle(self.shuffle_list)
 
     def get_tqdm(self):
+        """
+        Return a tqdm object.
+
+        Args:
+            self: (todo): write your description
+        """
         self.batch_count = 0
 
         if self.total_batch_num <= 0:
@@ -74,6 +128,12 @@ class LargeDataset(object):
             return tqdm(self, mininterval=2, total=self.total_batch_num, leave=False, file=sys.stdout, ncols=80).__iter__()
 
     def __iter__(self):
+        """
+        Iterate iterator over the file.
+
+        Args:
+            self: (todo): write your description
+        """
         self.cur_idx = 0
         self.file_idx = 0
         self.index_length = 0
@@ -81,6 +141,12 @@ class LargeDataset(object):
         return self
 
     def __next__(self):
+        """
+        Return the next word.
+
+        Args:
+            self: (todo): write your description
+        """
         if self.cur_idx >= self.index_length:
             self.open_next()
 
@@ -90,6 +156,12 @@ class LargeDataset(object):
         return word_t, label_t
 
     def open_next(self):
+        """
+        Open the next batch.
+
+        Args:
+            self: (todo): write your description
+        """
         if self.file_idx >= self.range_idx:
             self.total_batch_num = self.batch_count
             raise StopIteration

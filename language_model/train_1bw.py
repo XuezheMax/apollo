@@ -22,6 +22,13 @@ from optim import RAdamW, Apollo
 
 
 def logging(info, logfile=None):
+    """
+    Write a message to logger.
+
+    Args:
+        info: (todo): write your description
+        logfile: (str): write your description
+    """
     print(info)
     if logfile is not None:
         print(info, file=logfile)
@@ -29,6 +36,19 @@ def logging(info, logfile=None):
 
 
 def get_optimizer(opt, learning_rate, parameters, lr_decay, decay_rate, milestone, warmup_updates, init_lr):
+    """
+    Get optimizer.
+
+    Args:
+        opt: (str): write your description
+        learning_rate: (float): write your description
+        parameters: (todo): write your description
+        lr_decay: (str): write your description
+        decay_rate: (str): write your description
+        milestone: (str): write your description
+        warmup_updates: (str): write your description
+        init_lr: (str): write your description
+    """
     if opt == 'sgd':
         optimizer = SGD(parameters, lr=learning_rate, momentum=0.9, weight_decay=0., nesterov=True)
     elif opt == 'radam':
@@ -52,6 +72,13 @@ def get_optimizer(opt, learning_rate, parameters, lr_decay, decay_rate, mileston
 
 
 def evaluate(args, data_loader, lm_model):
+    """
+    Evaluate the model.
+
+    Args:
+        data_loader: (todo): write your description
+        lm_model: (todo): write your description
+    """
     logging('evaluating', args.log)
     lm_model.eval()
 

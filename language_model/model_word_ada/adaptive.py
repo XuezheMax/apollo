@@ -10,6 +10,17 @@ _ASMoutput = namedtuple('ASMoutput', ['output', 'loss'])
 class AdaptiveLogSoftmaxWithLoss(Module):
 
     def __init__(self, in_features, n_classes, cutoffs, div_value=4., head_bias=False):
+        """
+        Initialize the network.
+
+        Args:
+            self: (todo): write your description
+            in_features: (int): write your description
+            n_classes: (todo): write your description
+            cutoffs: (float): write your description
+            div_value: (str): write your description
+            head_bias: (todo): write your description
+        """
         super(AdaptiveLogSoftmaxWithLoss, self).__init__()
 
         cutoffs = list(cutoffs)
@@ -50,6 +61,14 @@ class AdaptiveLogSoftmaxWithLoss(Module):
             self.tail.append(projection)
 
     def forward(self, input, target):
+        """
+        Forward computation.
+
+        Args:
+            self: (todo): write your description
+            input: (todo): write your description
+            target: (todo): write your description
+        """
         if input.size(0) != target.size(0):
             raise RuntimeError('Input and target should have the same size '
                                'in the batch dimension.')

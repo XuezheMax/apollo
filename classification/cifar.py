@@ -26,6 +26,11 @@ from utils import AverageMeter, accuracy
 
 
 def parse_args():
+    """
+    Parse command line arguments.
+
+    Args:
+    """
     parser = ArgumentParser(description='CIFAR')
     parser.add_argument('--depth', type=int, help='architecture', required=True)
     parser.add_argument('--batch_size', type=int, default=128, metavar='N', help='input batch size for training (default: 128)')
@@ -56,6 +61,13 @@ def parse_args():
 
 
 def logging(info, logfile=None):
+    """
+    Write a message to logger.
+
+    Args:
+        info: (todo): write your description
+        logfile: (str): write your description
+    """
     print(info)
     if logfile is not None:
         print(info, file=logfile)
@@ -64,6 +76,26 @@ def logging(info, logfile=None):
 
 def get_optimizer(opt, learning_rate, parameters, hyper1, hyper2, eps, amsgrad,
                   lr_decay, decay_rate, milestone, weight_decay, warmup_updates, init_lr, last_lr, num_epochs):
+    """
+    Get the optimizer.
+
+    Args:
+        opt: (str): write your description
+        learning_rate: (float): write your description
+        parameters: (todo): write your description
+        hyper1: (str): write your description
+        hyper2: (str): write your description
+        eps: (float): write your description
+        amsgrad: (str): write your description
+        lr_decay: (str): write your description
+        decay_rate: (str): write your description
+        milestone: (str): write your description
+        weight_decay: (str): write your description
+        warmup_updates: (str): write your description
+        init_lr: (str): write your description
+        last_lr: (str): write your description
+        num_epochs: (int): write your description
+    """
     if opt == 'sgd':
         optimizer = SGD(parameters, lr=learning_rate, momentum=hyper1, weight_decay=weight_decay, nesterov=True)
         opt = 'momentum=%.1f, ' % (hyper1)
@@ -101,6 +133,11 @@ def get_optimizer(opt, learning_rate, parameters, hyper1, hyper2, eps, amsgrad,
 
 
 def setup(args):
+    """
+    Setup the training dataset.
+
+    Args:
+    """
     dataset = args.dataset
     data_path = args.data_path
 
@@ -154,6 +191,13 @@ def setup(args):
 
 
 def init_dataloader(args, trainset, valset):
+    """
+    Initialize dataloader.
+
+    Args:
+        trainset: (todo): write your description
+        valset: (todo): write your description
+    """
     train_loader = DataLoader(trainset, batch_size=args.batch_size, shuffle=True,
                               num_workers=args.workers, pin_memory=True, drop_last=True)
     val_loader = DataLoader(valset, batch_size=args.eval_batch_size, shuffle=False,
@@ -162,6 +206,16 @@ def init_dataloader(args, trainset, valset):
 
 
 def train(args, train_loader, num_train, model, criterion, optimizer):
+    """
+    Training function.
+
+    Args:
+        train_loader: (todo): write your description
+        num_train: (int): write your description
+        model: (todo): write your description
+        criterion: (int): write your description
+        optimizer: (todo): write your description
+    """
     model.train()
     start_time = time.time()
 
@@ -215,6 +269,14 @@ def train(args, train_loader, num_train, model, criterion, optimizer):
 
 
 def eval(args, val_loader, model, criterion):
+    """
+    Evaluate the model.
+
+    Args:
+        val_loader: (todo): write your description
+        model: (todo): write your description
+        criterion: (int): write your description
+    """
     model.eval()
     losses = AverageMeter()
     top1 = AverageMeter()
@@ -243,6 +305,11 @@ def eval(args, val_loader, model, criterion):
 
 
 def main(args):
+    """
+    Main function.
+
+    Args:
+    """
     args, (trainset, valset, num_train, num_val), model = setup(args)
 
     criterion = nn.CrossEntropyLoss()
@@ -307,6 +374,15 @@ def main(args):
 class ResNet(nn.Module):
 
     def __init__(self, depth, num_classes=1000, block_name='BasicBlock'):
+        """
+        Initialize the network.
+
+        Args:
+            self: (todo): write your description
+            depth: (float): write your description
+            num_classes: (int): write your description
+            block_name: (str): write your description
+        """
         super(ResNet, self).__init__()
         # Model type specifies number of layers for CIFAR-10 model
         if block_name.lower() == 'basicblock':
@@ -339,6 +415,16 @@ class ResNet(nn.Module):
                 m.bias.data.zero_()
 
     def _make_layer(self, block, planes, blocks, stride=1):
+        """
+        Make a layer.
+
+        Args:
+            self: (todo): write your description
+            block: (todo): write your description
+            planes: (todo): write your description
+            blocks: (todo): write your description
+            stride: (int): write your description
+        """
         downsample = None
         if stride != 1 or self.inplanes != planes * block.expansion:
             downsample = nn.Sequential(
@@ -356,6 +442,13 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
+        """
+        Transforms forward computation.
+
+        Args:
+            self: (todo): write your description
+            x: (todo): write your description
+        """
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)    # 32x32

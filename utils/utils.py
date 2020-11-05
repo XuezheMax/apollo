@@ -6,18 +6,38 @@ class AverageMeter(object):
        Imported from https://github.com/pytorch/examples/blob/master/imagenet/main.py#L247-L262
     """
     def __init__(self):
+        """
+        Initialize the gradient.
+
+        Args:
+            self: (todo): write your description
+        """
         self.val = 0
         self.avg = 0
         self.sum = 0
         self.count = 0
 
     def reset(self):
+        """
+        Reset the state.
+
+        Args:
+            self: (todo): write your description
+        """
         self.val = 0
         self.avg = 0
         self.sum = 0
         self.count = 0
 
     def update(self, val, n=1):
+        """
+        Updates the value
+
+        Args:
+            self: (todo): write your description
+            val: (float): write your description
+            n: (array): write your description
+        """
         self.val = val
         self.sum += val * n
         self.count += n
