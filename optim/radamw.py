@@ -6,6 +6,18 @@ from torch.optim.optimizer import Optimizer
 class RAdamW(Optimizer):
 
     def __init__(self, params, lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=0, degenerated_to_sgd=True):
+        """
+        Initialize the weights.
+
+        Args:
+            self: (todo): write your description
+            params: (dict): write your description
+            lr: (float): write your description
+            betas: (float): write your description
+            eps: (float): write your description
+            weight_decay: (float): write your description
+            degenerated_to_sgd: (todo): write your description
+        """
         if not 0.0 <= lr:
             raise ValueError("Invalid learning rate: {}".format(lr))
         if not 0.0 <= eps:
@@ -24,10 +36,24 @@ class RAdamW(Optimizer):
         super(RAdamW, self).__init__(params, defaults)
 
     def __setstate__(self, state):
+        """
+        Sets the state.
+
+        Args:
+            self: (todo): write your description
+            state: (dict): write your description
+        """
         super(RAdamW, self).__setstate__(state)
 
     @torch.no_grad()
     def step(self, closure=None):
+        """
+        Perform a single optimization step.
+
+        Args:
+            self: (todo): write your description
+            closure: (callable): write your description
+        """
         loss = None
         if closure is not None:
             loss = closure()

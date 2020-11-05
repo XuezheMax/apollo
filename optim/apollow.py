@@ -20,6 +20,19 @@ class ApolloW(Optimizer):
         """
 
     def __init__(self, params, lr, beta=0.9, eps=1e-4, warmup=100, init_lr=0.01, weight_decay=0):
+        """
+        Initialize the learning rate.
+
+        Args:
+            self: (todo): write your description
+            params: (dict): write your description
+            lr: (float): write your description
+            beta: (float): write your description
+            eps: (float): write your description
+            warmup: (int): write your description
+            init_lr: (float): write your description
+            weight_decay: (float): write your description
+        """
         if not 0.0 < lr:
             raise ValueError("Invalid learning rate value: {}".format(lr))
         if not 0.0 <= eps:
@@ -38,6 +51,13 @@ class ApolloW(Optimizer):
         super(ApolloW, self).__init__(params, defaults)
 
     def __setstate__(self, state):
+        """
+        Sets whether or not this button. : param state. : param state | <bool >
+
+        Args:
+            self: (todo): write your description
+            state: (dict): write your description
+        """
         super(ApolloW, self).__setstate__(state)
 
     @torch.no_grad()

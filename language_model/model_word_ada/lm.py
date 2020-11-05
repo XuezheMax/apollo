@@ -4,6 +4,19 @@ import torch.nn as nn
 class LM(nn.Module):
 
     def __init__(self, w_num, w_dim, rnn_unit, num_layers, hidden_dim, dropout, cutoffs):
+        """
+        Initialize the graph.
+
+        Args:
+            self: (todo): write your description
+            w_num: (int): write your description
+            w_dim: (int): write your description
+            rnn_unit: (int): write your description
+            num_layers: (int): write your description
+            hidden_dim: (int): write your description
+            dropout: (str): write your description
+            cutoffs: (float): write your description
+        """
         super(LM, self).__init__()
 
         self.w_num = w_num
@@ -18,6 +31,12 @@ class LM(nn.Module):
         self.reset_parameters()
 
     def reset_parameters(self):
+        """
+        Reset the embedding.
+
+        Args:
+            self: (todo): write your description
+        """
         nn.init.kaiming_uniform_(self.word_embed.weight)
 
         for param in self.rnn.parameters():
@@ -32,6 +51,13 @@ class LM(nn.Module):
                 raise ValueError('unexpected parameter for RNN {}'.format(param.size()))
 
     def detach_hx(self, hx):
+        """
+        Detach an hxh object.
+
+        Args:
+            self: (todo): write your description
+            hx: (todo): write your description
+        """
         if isinstance(hx, tuple):
             hx, cx = hx
             hx = (hx.detach(), cx.detach())
@@ -40,6 +66,15 @@ class LM(nn.Module):
         return hx
 
     def forward(self, w_in, target, hx):
+        """
+        Forward computation.
+
+        Args:
+            self: (todo): write your description
+            w_in: (todo): write your description
+            target: (todo): write your description
+            hx: (todo): write your description
+        """
         w_emb = self.dropout(self.word_embed(w_in))
 
         out, hx = self.rnn(w_emb, hx=hx)
@@ -51,6 +86,14 @@ class LM(nn.Module):
         return out.loss, self.detach_hx(hx)
 
     def log_prob(self, w_in, hx):
+        """
+        Parameters ---------- w_in : int ) ] ) ]
+
+        Args:
+            self: (todo): write your description
+            w_in: (todo): write your description
+            hx: (todo): write your description
+        """
         w_emb = self.dropout(self.word_embed(w_in))
 
         out, hx = self.rnn(w_emb, hx=hx)

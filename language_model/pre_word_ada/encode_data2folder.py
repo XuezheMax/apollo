@@ -6,6 +6,13 @@ from tqdm import tqdm
 
 
 def encode_dataset(input_folder, w_map):
+    """
+    Encode all_dataset. : class.
+
+    Args:
+        input_folder: (todo): write your description
+        w_map: (dict): write your description
+    """
     w_sos = w_map['<S>']
     w_eos = w_map['</S>']
     w_unk = w_map['<UNK>']
@@ -28,6 +35,14 @@ def encode_dataset(input_folder, w_map):
 
 
 def encode_dataset2file(input_folder, output_folder, w_map):
+    """
+    Encode a list of dataset.
+
+    Args:
+        input_folder: (todo): write your description
+        output_folder: (str): write your description
+        w_map: (dict): write your description
+    """
     w_sos = w_map['<S>']
     w_eos = w_map['</S>']
     w_unk = w_map['<UNK>']
