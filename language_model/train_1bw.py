@@ -12,7 +12,7 @@ import math
 import json
 import numpy as np
 import torch
-from torch.nn.utils import clip_grad_norm_
+from utils import clip_grad_norm_
 from torch.optim import SGD, Adam
 from torch.optim.lr_scheduler import MultiStepLR
 
@@ -83,6 +83,7 @@ if __name__ == "__main__":
     parser.add_argument('--dropout', type=float, default=0.1)
     parser.add_argument('--epochs', type=int, default=14)
     parser.add_argument('--clip', type=float, default=0)
+    parser.add_argument('--clip_mode', choices=['total', 'each'], default='total')
     parser.add_argument('--opt', choices=['sgd', 'adam', 'radam', 'apollo'], help='optimizer', required=True)
     parser.add_argument('--rnn_unit', choices=['gru', 'lstm', 'rnn'], default='lstm')
     parser.add_argument('--lr', type=float, required=True)
@@ -141,6 +142,7 @@ if __name__ == "__main__":
     opt = args.opt
     epochs = args.epochs
     clip = args.clip
+    clip_mode = args.clip_mode
     lr_warmup = args.warmup_updates
     init_lr = args.init_lr
     lr_decay = args.lr_decay
@@ -179,7 +181,7 @@ if __name__ == "__main__":
     for epoch in range(start_epoch, epochs + 1):
         lr = scheduler.get_last_lr()[0]
         logging('#' * 90, args.log)
-        logging('Epoch: {}/{} ({}, lr={:.6f}, clip={:.1f}, {})'.format(epoch, epochs, opt, lr, clip, opt_param), args.log)
+        logging('Epoch: {}/{} ({}, lr={:.6f}, clip={:.1f} ({}), {})'.format(epoch, epochs, opt, lr, clip, clip_mode, opt_param), args.log)
         iterator = train_loader.get_tqdm()
         full_epoch_loss = 0
         lm_model.train()
@@ -205,7 +207,7 @@ if __name__ == "__main__":
             batch_index += 1
             loss.backward()
             if clip > 0.:
-                clip_grad_norm_(lm_model.parameters(), clip)
+                clip_grad_norm_(lm_model.parameters(), clip, mode=clip_mode)
             optimizer.step()
 
         scheduler.step()
