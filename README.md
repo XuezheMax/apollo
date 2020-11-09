@@ -84,7 +84,7 @@ To adjust the weight decay rates of Adam and RAdam, we multiply the original rat
 | :--------- | :--------------: |
 | Adam       |  36.68 (0.21)    |
 | RAdam      |  36.20 (0.38)    |
-| **Apollo** | **32.21 (0.13)** |
+| **Apollo** | **31.93 (0.08)** |
 
 We use 2-layer LSTMs with ```2048``` hidden size on [One Billion Words](https://www.statmt.org/lm-benchmark/).
 Some key hyper-parameters are listed in the following table. 
@@ -104,9 +104,9 @@ Since the weight decay rate is zero for all the optimizers, there is no differen
 
 | Method     |  Test BLEU       |
 | :--------  |  :-------------: |
-| Adam       |  27.83 (0.06)    |
-| RAdam      |  28.11 (0.17)    |
-| **Apollo** | **28.32 (0.12)** |
+| Adam       |  27.84 (0.12)    |
+| RAdam      |  28.15 (0.15)    |
+| **Apollo** | **28.34 (0.10)** |
 
 For the details of NMT experiments, please go to this [repo]().
 
