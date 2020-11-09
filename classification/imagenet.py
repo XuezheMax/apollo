@@ -24,7 +24,7 @@ import torchvision.models as models
 import torch.distributed as dist
 from apex.parallel import DistributedDataParallel
 
-from optim import Apollo, ApolloW, RAdamW
+from optim import Apollo, RAdamW
 from utils import AverageMeter, accuracy
 
 
@@ -58,7 +58,7 @@ def parse_args():
     parser.add_argument('--run', type=int, default=1, metavar='N', help='number of runs for the experiment')
     parser.add_argument('--log_interval', type=int, default=10, metavar='N',
                         help='how many batches to wait before logging training status')
-    parser.add_argument('--opt', choices=['sgd', 'adamw', 'radamw', 'apollo', 'apollow'], help='optimizer', required=True)
+    parser.add_argument('--opt', choices=['sgd', 'adamw', 'radamw', 'apollo'], help='optimizer', required=True)
     parser.add_argument('--lr', type=float, required=True, help='learning rate')
     parser.add_argument('--warmup_updates', type=int, default=0, metavar='N', help='number of updates to warm up (default: 0)')
     parser.add_argument('--init_lr', type=float, default=0., help='initial learning rate')
@@ -70,6 +70,7 @@ def parse_args():
     parser.add_argument('--opt_h2', type=float, default=0.999, help='beta2 of Adam or RAdam')
     parser.add_argument('--eps', type=float, default=1e-8, help='eps of Adam')
     parser.add_argument('--weight_decay', type=float, default=1e-4, help='weight for l2 norm decay')
+    parser.add_argument('--weight_decay_type', choices=['L2', 'decoupled', 'stable'], default='L2', help='type of weight decay')
     parser.add_argument('--amsgrad', action='store_true', help='AMS Grad')
     parser.add_argument('--workers', default=6, type=int, metavar='N', help='number of data loading workers (default: 6)')
     parser.add_argument('--data_path', help='path for data file.', required=True)
@@ -102,23 +103,23 @@ def logging(info, logfile=None):
 
 
 def get_optimizer(opt, learning_rate, parameters, hyper1, hyper2, eps, amsgrad,
-                  lr_decay, decay_rate, milestone, weight_decay, warmup_updates, init_lr, last_lr, num_epochs):
+                  lr_decay, decay_rate, milestone, weight_decay, weight_decay_type,
+                  warmup_updates, init_lr, last_lr, num_epochs):
     if opt == 'sgd':
         optimizer = SGD(parameters, lr=learning_rate, momentum=hyper1, weight_decay=weight_decay, nesterov=True)
         opt = 'momentum=%.1f, ' % (hyper1)
+        weight_decay_type = 'L2'
     elif opt == 'radamw':
         optimizer = RAdamW(parameters, lr=learning_rate, betas=(hyper1, hyper2), eps=eps, weight_decay=weight_decay)
         opt = 'betas=(%.1f, %.3f), eps=%.1e, ' % (hyper1, hyper2, eps)
+        weight_decay_type = 'decoupled'
     elif opt == 'adamw':
         optimizer = AdamW(parameters, lr=learning_rate, betas=(hyper1, hyper2), eps=eps, amsgrad=amsgrad, weight_decay=weight_decay)
         opt = 'betas=(%.1f, %.3f), eps=%.1e, amsgrad=%s, ' % (hyper1, hyper2, eps, amsgrad)
+        weight_decay_type = 'decoupled'
     elif opt == 'apollo':
         optimizer = Apollo(parameters, lr=learning_rate, beta=hyper1, eps=eps, warmup=warmup_updates,
-                           init_lr=init_lr, weight_decay=weight_decay)
-        opt = 'beta=%.1f, eps=%.1e, ' % (hyper1, eps)
-    elif opt == 'apollow':
-        optimizer = ApolloW(parameters, lr=learning_rate, beta=hyper1, eps=eps, warmup=warmup_updates,
-                            init_lr=init_lr, weight_decay=weight_decay)
+                           init_lr=init_lr, weight_decay=weight_decay, weight_decay_type=weight_decay_type)
         opt = 'beta=%.1f, eps=%.1e, ' % (hyper1, eps)
     else:
         raise ValueError('unknown optimizer: {}'.format(opt))
@@ -135,7 +136,7 @@ def get_optimizer(opt, learning_rate, parameters, hyper1, hyper2, eps, amsgrad,
     else:
         raise ValueError('unknown lr decay: {}'.format(lr_decay))
 
-    opt += 'warmup={}, init_lr={:.1e}, wd={:.1e}'.format(warmup_updates, init_lr, weight_decay)
+    opt += 'warmup={}, init_lr={:.1e}, wd={:.1e} ({})'.format(warmup_updates, init_lr, weight_decay, weight_decay_type)
     return optimizer, scheduler, opt
 
 
@@ -253,12 +254,13 @@ def single_process_main(args):
     decay_rate = args.decay_rate
     milestone = args.milestone
     weight_decay = args.weight_decay
+    weight_decay_type = args.weight_decay_type
     last_lr = args.last_lr
 
     optimizer, scheduler, opt_param = get_optimizer(opt, args.lr, model.parameters(), hyper1, hyper2, eps, amsgrad,
                                                     lr_decay=lr_decay, decay_rate=decay_rate, milestone=milestone,
-                                                    weight_decay=weight_decay, warmup_updates=lr_warmup, init_lr=init_lr,
-                                                    last_lr=last_lr, num_epochs=epochs)
+                                                    weight_decay=weight_decay, weight_decay_type=weight_decay_type,
+                                                    warmup_updates=lr_warmup, init_lr=init_lr, last_lr=last_lr, num_epochs=epochs)
 
     if args.recover:
         checkpoint_name = args.checkpoint_name

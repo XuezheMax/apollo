@@ -16,10 +16,11 @@ class Apollo(Optimizer):
             warmup (int, optional): number of warmup steps (default: 0)
             init_lr (float, optional): initial learning rate for warmup (default: 0.01)
             weight_decay (float, optional): weight decay coefficient (default: 0)
-
+            weight_decay_type (str, optional): type of weight decay:
+                ``'L2'`` | ``'decoupled'`` | ``'stable'`` (default: 'L2')
         """
 
-    def __init__(self, params, lr, beta=0.9, eps=1e-4, warmup=100, init_lr=0.01, weight_decay=0):
+    def __init__(self, params, lr, beta=0.9, eps=1e-4, warmup=100, init_lr=0.01, weight_decay=0, weight_decay_type='L2'):
         if not 0.0 < lr:
             raise ValueError("Invalid learning rate value: {}".format(lr))
         if not 0.0 <= eps:
@@ -32,9 +33,11 @@ class Apollo(Optimizer):
             raise ValueError("Invalid warmup updates: {}".format(warmup))
         if not 0.0 <= init_lr <= 1.0:
             raise ValueError("Invalid initial learning rate: {}".format(init_lr))
+        if weight_decay_type not in ['L2', 'decoupled', 'stable']:
+            raise ValueError("Invalid weight decay type: {}".format(weight_decay_type))
 
-        defaults = dict(lr=lr, beta=beta, eps=eps, warmup=warmup,
-                        init_lr=init_lr, base_lr=lr, weight_decay=weight_decay)
+        defaults = dict(lr=lr, beta=beta, eps=eps, warmup=warmup, init_lr=init_lr, base_lr=lr,
+                        weight_decay=weight_decay, weight_decay_type=weight_decay_type)
         super(Apollo, self).__init__(params, defaults)
 
     def __setstate__(self, state):
@@ -81,7 +84,7 @@ class Apollo(Optimizer):
                     raise RuntimeError('Atom does not support sparse gradients.')
 
                 # Perform step weight decay
-                if group['weight_decay'] != 0:
+                if group['weight_decay'] != 0 and group['weight_decay_type'] == 'L2':
                     grad = grad.add(p, alpha=group['weight_decay'])
 
                 beta = group['beta']
@@ -108,6 +111,14 @@ class Apollo(Optimizer):
                 # calc direction of parameter updates
                 denom = B.abs().clamp_(min=1)
                 d_p.copy_(exp_avg_grad.div(denom))
+
+                # Perform step weight decay
+                if group['weight_decay'] != 0 and group['weight_decay_type'] != 'L2':
+                    if group['weight_decay_type'] == 'stable':
+                        weight_decay = group['weight_decay'] / denom.mean().item()
+                    else:
+                        weight_decay = group['weight_decay']
+                    d_p.add_(p, alpha=weight_decay)
 
                 p.add_(d_p, alpha=-curr_lr)
 
