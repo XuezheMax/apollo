@@ -24,7 +24,7 @@ import torchvision.models as models
 import torch.distributed as dist
 from apex.parallel import DistributedDataParallel
 
-from optim import Apollo, RAdamW
+from optim import Apollo, RAdamW, AdaHessian
 from utils import AverageMeter, accuracy
 
 
@@ -51,14 +51,12 @@ def parse_args():
     parser.add_argument('--arch', choices=['resnet18', 'resnet34', 'resnext50'], help='architecture', required=True)
     parser.add_argument('--batch_size', type=int, default=256, metavar='N', help='input batch size for training (default: 256)')
     parser.add_argument('--eval_batch_size', type=int, default=1000, metavar='N', help='input batch size for eval (default: 1000)')
-    parser.add_argument('--batch_steps', type=int, default=1, metavar='N',
-                        help='number of steps for each batch (the batch size of each step is batch-size / steps (default: 1)')
     parser.add_argument('--epochs', type=int, default=120, metavar='N', help='number of epochs to train')
     parser.add_argument('--seed', type=int, default=None, metavar='S', help='random seed (default: None)')
     parser.add_argument('--run', type=int, default=1, metavar='N', help='number of runs for the experiment')
     parser.add_argument('--log_interval', type=int, default=10, metavar='N',
                         help='how many batches to wait before logging training status')
-    parser.add_argument('--opt', choices=['sgd', 'adamw', 'radamw', 'apollo'], help='optimizer', required=True)
+    parser.add_argument('--opt', choices=['sgd', 'adamw', 'radamw', 'apollo', 'adahessian'], help='optimizer', required=True)
     parser.add_argument('--lr', type=float, required=True, help='learning rate')
     parser.add_argument('--warmup_updates', type=int, default=0, metavar='N', help='number of updates to warm up (default: 0)')
     parser.add_argument('--init_lr', type=float, default=0., help='initial learning rate')
@@ -121,6 +119,10 @@ def get_optimizer(opt, learning_rate, parameters, hyper1, hyper2, eps, amsgrad,
         optimizer = Apollo(parameters, lr=learning_rate, beta=hyper1, eps=eps, warmup=warmup_updates,
                            init_lr=init_lr, weight_decay=weight_decay, weight_decay_type=weight_decay_type)
         opt = 'beta=%.1f, eps=%.1e, ' % (hyper1, eps)
+    elif opt == 'adahessian':
+        optimizer = AdaHessian(parameters, lr=learning_rate, betas=(hyper1, hyper2), eps=eps, weight_decay=weight_decay)
+        opt = 'betas=(%.1f, %.3f), eps=%.1e, ' % (hyper1, hyper2, eps)
+        weight_decay_type = 'decoupled'
     else:
         raise ValueError('unknown optimizer: {}'.format(opt))
 
@@ -349,7 +351,7 @@ def train(args, train_loader, num_train, model, criterion, optimizer):
     num_back = 0
 
     device = args.device
-    batch_steps = args.batch_steps
+    create_graph = args.opt == 'adahessian'
 
     if args.cuda:
         torch.cuda.empty_cache()
@@ -369,7 +371,7 @@ def train(args, train_loader, num_train, model, criterion, optimizer):
         top1.update(prec1.item(), data.size(0))
         top5.update(prec5.item(), data.size(0))
 
-        loss.backward()
+        loss.backward(create_graph=create_graph)
 
         optimizer.step()
 
