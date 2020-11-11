@@ -18,7 +18,7 @@ from torch.optim.lr_scheduler import MultiStepLR
 
 from language_model.model_word_ada.lm import LM
 from language_model.model_word_ada.dataset import LargeDataset, EvalDataset
-from optim import RAdamW, Apollo
+from optim import RAdamW, Apollo, AdaHessian
 
 
 def logging(info, logfile=None):
@@ -37,6 +37,8 @@ def get_optimizer(opt, learning_rate, parameters, lr_decay, decay_rate, mileston
         optimizer = Adam(parameters, lr=learning_rate, betas=(0.9, 0.999), weight_decay=0.)
     elif opt == 'apollo':
         optimizer = Apollo(parameters, lr=learning_rate, beta=0.9, eps=1e-4, warmup=warmup_updates, init_lr=init_lr, weight_decay=0.)
+    elif opt == 'adahessian':
+        optimizer = AdaHessian(parameters, lr=learning_rate, betas=(0.9, 0.999), eps=1e-4)
     else:
         raise ValueError('unknown optimizer: {}'.format(opt))
 
@@ -84,7 +86,7 @@ if __name__ == "__main__":
     parser.add_argument('--epochs', type=int, default=14)
     parser.add_argument('--clip', type=float, default=0)
     parser.add_argument('--clip_mode', choices=['total', 'each'], default='total')
-    parser.add_argument('--opt', choices=['sgd', 'adam', 'radam', 'apollo'], help='optimizer', required=True)
+    parser.add_argument('--opt', choices=['sgd', 'adam', 'radam', 'apollo', 'adahessian'], help='optimizer', required=True)
     parser.add_argument('--rnn_unit', choices=['gru', 'lstm', 'rnn'], default='lstm')
     parser.add_argument('--lr', type=float, required=True)
     parser.add_argument('--lr_decay', choices=['milestone'], default='milestone', help='Decay rate of learning rate')
@@ -150,6 +152,7 @@ if __name__ == "__main__":
     milestone = args.milestone
     optimizer, scheduler, opt_param = get_optimizer(opt, args.lr, lm_model.parameters(), warmup_updates=lr_warmup, init_lr=init_lr,
                                                     lr_decay=lr_decay, decay_rate=decay_rate, milestone=milestone)
+    create_graph = args.opt == 'adahessian'
 
     if args.recover:
         checkpoint_name = args.checkpoint_name
@@ -205,7 +208,7 @@ if __name__ == "__main__":
                 numbers['train ppl'].append(train_ppl)
 
             batch_index += 1
-            loss.backward()
+            loss.backward(create_graph=create_graph)
             if clip > 0.:
                 clip_grad_norm_(lm_model.parameters(), clip, mode=clip_mode)
             optimizer.step()
