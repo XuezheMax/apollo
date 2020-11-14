@@ -125,6 +125,9 @@ if __name__ == "__main__":
     if args.cuda:
         torch.cuda.set_device(device)
 
+    if args.opt == 'adahessian':
+        torch.backends.cudnn.enabled = False
+
     logging("Args: " + str(args), args.log)
 
     logging('loading dataset')

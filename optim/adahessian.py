@@ -1,7 +1,8 @@
 import torch
+from torch.optim.optimizer import Optimizer
 
 
-class AdaHessian(torch.optim.Optimizer):
+class AdaHessian(Optimizer):
     """
     Implements the AdaHessian algorithm from "ADAHESSIAN: An Adaptive Second OrderOptimizer for Machine Learning"
     Arguments:
