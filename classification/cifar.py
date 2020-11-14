@@ -83,7 +83,8 @@ def get_optimizer(opt, learning_rate, parameters, hyper1, hyper2, eps, amsgrad,
                            init_lr=init_lr, weight_decay=weight_decay, weight_decay_type=weight_decay_type)
         opt = 'beta=%.1f, eps=%.1e, ' % (hyper1, eps)
     elif opt == 'adahessian':
-        optimizer = AdaHessian(parameters, lr=learning_rate, betas=(hyper1, hyper2), eps=eps, weight_decay=weight_decay)
+        optimizer = AdaHessian(parameters, lr=learning_rate, betas=(hyper1, hyper2), eps=eps, warmup=warmup_updates,
+                               init_lr=init_lr, weight_decay=weight_decay)
         opt = 'betas=(%.1f, %.3f), eps=%.1e, ' % (hyper1, hyper2, eps)
         weight_decay_type = 'decoupled'
     else:

@@ -36,9 +36,11 @@ def get_optimizer(opt, learning_rate, parameters, lr_decay, decay_rate, mileston
     elif opt == 'adam':
         optimizer = Adam(parameters, lr=learning_rate, betas=(0.9, 0.999), weight_decay=0.)
     elif opt == 'apollo':
-        optimizer = Apollo(parameters, lr=learning_rate, beta=0.9, eps=1e-4, warmup=warmup_updates, init_lr=init_lr, weight_decay=0.)
+        optimizer = Apollo(parameters, lr=learning_rate, beta=0.9, eps=1e-4, warmup=warmup_updates,
+                           init_lr=init_lr, weight_decay=0.)
     elif opt == 'adahessian':
-        optimizer = AdaHessian(parameters, lr=learning_rate, betas=(0.9, 0.999), eps=1e-4)
+        optimizer = AdaHessian(parameters, lr=learning_rate, betas=(0.9, 0.999), eps=1e-4,
+                               warmup=warmup_updates, init_lr=init_lr, weight_decay=0.)
     else:
         raise ValueError('unknown optimizer: {}'.format(opt))
 
@@ -48,7 +50,7 @@ def get_optimizer(opt, learning_rate, parameters, lr_decay, decay_rate, mileston
     else:
         raise ValueError('unknown lr decay: {}'.format(lr_decay))
 
-    if opt == 'apollo':
+    if opt in ['apollo', 'adahessian']:
         opt_param += ', warmup={}, init_lr={:.1e}'.format(warmup_updates, init_lr)
     return optimizer, scheduler, opt_param
 

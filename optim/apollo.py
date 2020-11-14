@@ -8,19 +8,19 @@ class Apollo(Optimizer):
         Arguments:
             params (iterable): iterable of parameters to optimize or dicts defining
                 parameter groups
-            lr (float): learning rate
+            lr (float): learning rate (default: 1.0)
             beta (float, optional): coefficient used for computing
                 running averages of gradient (default: 0.9)
             eps (float, optional): term added to the denominator to improve
                 numerical stability (default: 1e-4)
-            warmup (int, optional): number of warmup steps (default: 0)
+            warmup (int, optional): number of warmup steps (default: 100)
             init_lr (float, optional): initial learning rate for warmup (default: 0.01)
             weight_decay (float, optional): weight decay coefficient (default: 0)
             weight_decay_type (str, optional): type of weight decay:
                 ``'L2'`` | ``'decoupled'`` | ``'stable'`` (default: 'L2')
         """
 
-    def __init__(self, params, lr, beta=0.9, eps=1e-4, warmup=100, init_lr=0.01, weight_decay=0, weight_decay_type='L2'):
+    def __init__(self, params, lr=1.0, beta=0.9, eps=1e-4, warmup=100, init_lr=0.01, weight_decay=0, weight_decay_type='L2'):
         if not 0.0 < lr:
             raise ValueError("Invalid learning rate value: {}".format(lr))
         if not 0.0 <= eps:

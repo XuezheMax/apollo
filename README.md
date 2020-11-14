@@ -84,7 +84,7 @@ To adjust the weight decay rates of Adam and RAdam, we multiply the original rat
 | :--------- | :--------------: |
 | Adam       |  36.68 (0.21)    |
 | RAdam      |  36.20 (0.38)    |
-| **Apollo** | **31.93 (0.08)** |
+| **Apollo** | **31.94 (0.09)** |
 
 We use 2-layer LSTMs with ```2048``` hidden size on [One Billion Words](https://www.statmt.org/lm-benchmark/).
 Some key hyper-parameters are listed in the following table. 
