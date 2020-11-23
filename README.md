@@ -108,7 +108,18 @@ Since the weight decay rate is zero for all the optimizers, there is no differen
 | RAdam      |  28.15 (0.15)    |
 | **Apollo** | **28.34 (0.10)** |
 
-For the details of NMT experiments, please go to this [repo]().
+We use the Transformer-base models.
+Some key hyper-parameters are listed in the following table.
+For the details of NMT experiments, please go to this [repo](https://github.com/XuezheMax/fairseq-apollo).
+
+**Transformer-base on WMT-14 En-De**
+
+|  Method    |    lr      |  weight decay  |  decoupled weight decay |    lr scheduler     |  warmup updates  |  init_lr  |  gradient clip  |
+| :--------- | :--------: | :------------: | :---------------------: | :-----------------: | :--------------: | :-------: | :-------------: |
+|  SGD       |   0.1      |      1e-6      |         False           |      milestone      |       1000       |    1e-4   |      1.0        |
+|  Adam      |   0.0005   |      1e-4      |         True            |    inverse sqrt     |       4000       |    1e-7   |      1.0        |
+|  RAdam     |   0.0005   |      1e-4      |         True            |      milestone      |        0         |     NA    |      1.0        |
+|  Apollo    |   10.0     |      1e-8      |         False           |      milestone      |       1000       |    0.01   |      1.0        |
 
 ## Discussion
 **1. Weight Decay:**
