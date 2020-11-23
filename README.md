@@ -104,6 +104,7 @@ Since the weight decay rate is zero for all the optimizers, there is no differen
 
 | Method     |  Test BLEU       |
 | :--------  |  :-------------: |
+| SGD        |  26.59 (0.07)    |
 | Adam       |  27.84 (0.12)    |
 | RAdam      |  28.15 (0.15)    |
 | **Apollo** | **28.34 (0.10)** |
