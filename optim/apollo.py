@@ -10,10 +10,8 @@ class Apollo(Optimizer):
             params (iterable): iterable of parameters to optimize or dicts defining
                 parameter groups
             lr (float): learning rate
-            beta (float, optional): coefficient used for computing
-                running averages of gradient (default: 0.9)
-            eps (float, optional): term added to the denominator to improve
-                numerical stability (default: 1e-4)
+            beta (float, optional): coefficient used for computing running averages of gradient (default: 0.9)
+            eps (float, optional): term added to the denominator to improve numerical stability (default: 1e-4)
             rebound (str, optional): recified bound for diagonal hessian:
                 ``'constant'`` | ``'belief'`` (default: None)
             warmup (int, optional): number of warmup steps (default: 100)
