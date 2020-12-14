@@ -46,8 +46,8 @@ def parse_args():
     parser.add_argument('--opt_h2', type=float, default=0.999, help='beta2 of Adam or RAdam')
     parser.add_argument('--eps', type=float, default=1e-8, help='eps of Adam')
     parser.add_argument('--weight_decay', type=float, default=5e-4, help='weight for l2 norm decay')
-    parser.add_argument('--weight_decay_type', choices=['L2', 'decoupled', 'stable'], default='L2', help='type of weight decay')
-    parser.add_argument('--amsgrad', action='store_true', help='AMS Grad')
+    parser.add_argument('--weight_decay_type', choices=['L2', 'decoupled', 'stable'], default=None, help='type of weight decay')
+    parser.add_argument('--rebound', choices=['constant', 'belief'], default='constant', help='type of recified bound of diagonal hessian')
     parser.add_argument('--dataset', choices=['cifar10', 'cifar100'], required=True)
     parser.add_argument('--workers', default=2, type=int, metavar='N', help='number of data loading workers (default: 2)')
     parser.add_argument('--data_path', help='path for data file.', required=True)
@@ -63,7 +63,7 @@ def logging(info, logfile=None):
         logfile.flush()
 
 
-def get_optimizer(opt, learning_rate, parameters, hyper1, hyper2, eps, amsgrad,
+def get_optimizer(opt, learning_rate, parameters, hyper1, hyper2, eps, rebound,
                   lr_decay, decay_rate, milestone, weight_decay, weight_decay_type,
                   warmup_updates, init_lr, last_lr, num_epochs):
     if opt == 'sgd':
@@ -75,16 +75,17 @@ def get_optimizer(opt, learning_rate, parameters, hyper1, hyper2, eps, amsgrad,
         opt = 'betas=(%.1f, %.3f), eps=%.1e, ' % (hyper1, hyper2, eps)
         weight_decay_type = 'decoupled'
     elif opt == 'adamw':
-        optimizer = AdamW(parameters, lr=learning_rate, betas=(hyper1, hyper2), eps=eps, amsgrad=amsgrad, weight_decay=weight_decay)
-        opt = 'betas=(%.1f, %.3f), eps=%.1e, amsgrad=%s, ' % (hyper1, hyper2, eps, amsgrad)
+        optimizer = AdamW(parameters, lr=learning_rate, betas=(hyper1, hyper2), eps=eps, weight_decay=weight_decay)
+        opt = 'betas=(%.1f, %.3f), eps=%.1e, ' % (hyper1, hyper2, eps)
         weight_decay_type = 'decoupled'
     elif opt == 'apollo':
-        optimizer = Apollo(parameters, lr=learning_rate, beta=hyper1, eps=eps, warmup=warmup_updates,
-                           init_lr=init_lr, weight_decay=weight_decay, weight_decay_type=weight_decay_type)
-        opt = 'beta=%.1f, eps=%.1e, ' % (hyper1, eps)
+        optimizer = Apollo(parameters, lr=learning_rate, beta=hyper1, eps=eps, rebound=rebound,
+                           warmup=warmup_updates, init_lr=init_lr, weight_decay=weight_decay,
+                           weight_decay_type=weight_decay_type)
+        opt = 'beta=%.1f, eps=%.1e, rebound=%s, ' % (hyper1, eps, rebound)
     elif opt == 'adahessian':
-        optimizer = AdaHessian(parameters, lr=learning_rate, betas=(hyper1, hyper2), eps=eps, warmup=warmup_updates,
-                               init_lr=init_lr, weight_decay=weight_decay)
+        optimizer = AdaHessian(parameters, lr=learning_rate, betas=(hyper1, hyper2), eps=eps,
+                               warmup=warmup_updates, init_lr=init_lr, weight_decay=weight_decay)
         opt = 'betas=(%.1f, %.3f), eps=%.1e, ' % (hyper1, hyper2, eps)
         weight_decay_type = 'decoupled'
     else:
@@ -267,7 +268,7 @@ def main(args):
     hyper1 = args.opt_h1
     hyper2 = args.opt_h2
     eps = args.eps
-    amsgrad = args.amsgrad
+    rebound = args.rebound
     lr_decay = args.lr_decay
     decay_rate = args.decay_rate
     milestone = args.milestone
@@ -277,7 +278,7 @@ def main(args):
 
     numbers = {'train loss': [], 'train acc': [], 'test loss': [], 'test acc': []}
 
-    optimizer, scheduler, opt_param = get_optimizer(opt, args.lr, model.parameters(), hyper1, hyper2, eps, amsgrad,
+    optimizer, scheduler, opt_param = get_optimizer(opt, args.lr, model.parameters(), hyper1, hyper2, eps, rebound,
                                                     lr_decay=lr_decay, decay_rate=decay_rate, milestone=milestone,
                                                     weight_decay=weight_decay, weight_decay_type=weight_decay_type,
                                                     warmup_updates=lr_warmup, init_lr=init_lr, last_lr=last_lr, num_epochs=epochs)

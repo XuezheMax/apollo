@@ -1,5 +1,6 @@
 import torch
 from torch.optim.optimizer import Optimizer
+import torch.distributed as dist
 
 
 class AdaHessian(Optimizer):
@@ -15,11 +16,11 @@ class AdaHessian(Optimizer):
         weight_decay (float, optional) -- weight decay (L2 penalty) (default: 0.0)
         hessian_power (float, optional) -- exponent of the hessian trace (default: 1.0)
         update_each (int, optional) -- compute the hessian trace approximation only after *this* number of steps (to save time) (default: 1)
-        n_samples (int, optional) -- how many times to sample `z` for the approximation of the hessian trace (default: 1)
     """
 
-    def __init__(self, params, lr=0.1, betas=(0.9, 0.999), eps=1e-8, warmup=0, init_lr=0.0, weight_decay=0.0,
-                 hessian_power=1.0, update_each=1, n_samples=1, average_conv_kernel=False):
+    def __init__(self, params, lr=0.1, betas=(0.9, 0.999), eps=1e-4, weight_decay=0.0,
+                 warmup=0, init_lr=0.0, hessian_power=1.0, update_each=1,
+                 num_threads=1, average_conv_kernel=False):
         if not 0.0 <= lr:
             raise ValueError(f"Invalid learning rate: {lr}")
         if not 0.0 <= eps:
@@ -35,12 +36,9 @@ class AdaHessian(Optimizer):
         if not 0.0 <= hessian_power <= 1.0:
             raise ValueError(f"Invalid Hessian power value: {hessian_power}")
 
-        self.n_samples = n_samples
         self.update_each = update_each
+        self.num_threads = num_threads
         self.average_conv_kernel = average_conv_kernel
-
-        # use a separate generator that deterministically generates the same `z`s across all GPUs in case of distributed training
-        self.generator = torch.Generator().manual_seed(2147483647)
 
         defaults = dict(lr=lr, betas=betas, eps=eps, warmup=warmup, init_lr=init_lr, base_lr=lr,
                         weight_decay=weight_decay, hessian_power=hessian_power)
@@ -81,16 +79,23 @@ class AdaHessian(Optimizer):
         if len(params) == 0:
             return
 
-        if self.generator.device != params[0].device:  # hackish way of casting the generator to the right device
-            self.generator = torch.Generator(params[0].device).manual_seed(2147483647)
-
         grads = [p.grad for p in params]
 
-        for i in range(self.n_samples):
-            zs = [torch.randint(0, 2, p.size(), generator=self.generator, device=p.device) * 2.0 - 1.0 for p in params]  # Rademacher distribution {-1.0, 1.0}
-            h_zs = torch.autograd.grad(grads, params, grad_outputs=zs, only_inputs=True, retain_graph=i < self.n_samples - 1)
-            for h_z, z, p in zip(h_zs, zs, params):
-                p.hess += h_z * z / self.n_samples  # approximate the expected values of z*(H@z)
+        # Rademacher distribution {-1.0, 1.0}
+        zs = [torch.randint_like(p, high=2) * 2.0 - 1.0 for p in params]
+        # sync zs for distributed setting
+        if self.num_threads > 1:
+            for z in zs:
+                dist.broadcast(z, src=0)
+
+        hzs = torch.autograd.grad(grads, params, grad_outputs=zs, only_inputs=True, retain_graph=True)
+
+        for hz, z, p in zip(hzs, zs, params):
+            hut_trace = hz * z  # approximate the expected values of z*(H@z)
+            if self.num_threads > 1:
+                dist.all_reduce(hut_trace)
+                hut_trace.div_(self.num_threads)
+            p.hess = hut_trace
 
     @torch.no_grad()
     def step(self, closure=None):

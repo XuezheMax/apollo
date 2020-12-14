@@ -28,7 +28,7 @@ def logging(info, logfile=None):
         logfile.flush()
 
 
-def get_optimizer(opt, learning_rate, parameters, lr_decay, decay_rate, milestone, warmup_updates, init_lr):
+def get_optimizer(opt, learning_rate, parameters, lr_decay, decay_rate, milestone, warmup_updates, init_lr, rebound):
     if opt == 'sgd':
         optimizer = SGD(parameters, lr=learning_rate, momentum=0.9, weight_decay=0., nesterov=True)
     elif opt == 'radam':
@@ -36,20 +36,19 @@ def get_optimizer(opt, learning_rate, parameters, lr_decay, decay_rate, mileston
     elif opt == 'adam':
         optimizer = Adam(parameters, lr=learning_rate, betas=(0.9, 0.999), weight_decay=0.)
     elif opt == 'apollo':
-        optimizer = Apollo(parameters, lr=learning_rate, beta=0.9, eps=1e-4, warmup=warmup_updates,
-                           init_lr=init_lr, weight_decay=0.)
+        optimizer = Apollo(parameters, lr=learning_rate, beta=0.9, eps=1e-4, rebound=rebound,
+                           warmup=warmup_updates, init_lr=init_lr, weight_decay=0.)
     elif opt == 'adahessian':
         optimizer = AdaHessian(parameters, lr=learning_rate, betas=(0.9, 0.999), eps=1e-4,
                                warmup=warmup_updates, init_lr=init_lr, weight_decay=0.)
     else:
         raise ValueError('unknown optimizer: {}'.format(opt))
 
-    if lr_decay == 'milestone':
-        opt_param = 'lr decay={} {}, decay rate={:.3f}'.format(lr_decay, milestone, decay_rate)
-        scheduler = MultiStepLR(optimizer, milestones=milestone, gamma=decay_rate)
-    else:
-        raise ValueError('unknown lr decay: {}'.format(lr_decay))
+    opt_param = 'lr decay={} {}, decay rate={:.3f}'.format(lr_decay, milestone, decay_rate)
+    scheduler = MultiStepLR(optimizer, milestones=milestone, gamma=decay_rate)
 
+    if opt == 'apollo':
+        opt_param += ', rebound=%s'.format(rebound)
     if opt in ['apollo', 'adahessian']:
         opt_param += ', warmup={}, init_lr={:.1e}'.format(warmup_updates, init_lr)
     return optimizer, scheduler, opt_param
@@ -94,6 +93,7 @@ if __name__ == "__main__":
     parser.add_argument('--lr_decay', choices=['milestone'], default='milestone', help='Decay rate of learning rate')
     parser.add_argument('--decay_rate', type=float, default=0.1, help='Decay rate of learning rate')
     parser.add_argument('--milestone', type=int, nargs='+', default=[12, 18], help='Decrease learning rate at these epochs.')
+    parser.add_argument('--rebound', choices=['constant', 'belief'], default='constant', help='type of recified bound of diagonal hessian')
     parser.add_argument('--warmup_updates', type=int, default=0, metavar='N', help='number of updates to warm up (default: 0)')
     parser.add_argument('--init_lr', type=float, default=0, help='initial learning rate')
     parser.add_argument('--cutoffs', nargs='+', default=[60000, 100000, 640000])
@@ -155,8 +155,9 @@ if __name__ == "__main__":
     lr_decay = args.lr_decay
     decay_rate = args.decay_rate
     milestone = args.milestone
+    rebound = args.rebound
     optimizer, scheduler, opt_param = get_optimizer(opt, args.lr, lm_model.parameters(), warmup_updates=lr_warmup, init_lr=init_lr,
-                                                    lr_decay=lr_decay, decay_rate=decay_rate, milestone=milestone)
+                                                    lr_decay=lr_decay, decay_rate=decay_rate, milestone=milestone, rebound=rebound)
     create_graph = args.opt == 'adahessian'
 
     if args.recover:
