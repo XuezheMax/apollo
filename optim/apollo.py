@@ -41,7 +41,8 @@ class Apollo(Optimizer):
         if weight_decay_type not in ['L2', 'decoupled', 'stable']:
             raise ValueError("Invalid weight decay type: {}".format(weight_decay_type))
 
-        defaults = dict(lr=lr, beta=beta, eps=eps, warmup=warmup, init_lr=init_lr, base_lr=lr,
+        defaults = dict(lr=lr, beta=beta, eps=eps, rebound=rebound,
+                        warmup=warmup, init_lr=init_lr, base_lr=lr,
                         weight_decay=weight_decay, weight_decay_type=weight_decay_type)
         super(Apollo, self).__init__(params, defaults)
 
