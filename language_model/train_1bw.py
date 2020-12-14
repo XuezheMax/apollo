@@ -48,7 +48,7 @@ def get_optimizer(opt, learning_rate, parameters, lr_decay, decay_rate, mileston
     scheduler = MultiStepLR(optimizer, milestones=milestone, gamma=decay_rate)
 
     if opt == 'apollo':
-        opt_param += ', rebound=%s'.format(rebound)
+        opt_param += ', rebound={}'.format(rebound)
     if opt in ['apollo', 'adahessian']:
         opt_param += ', warmup={}, init_lr={:.1e}'.format(warmup_updates, init_lr)
     return optimizer, scheduler, opt_param
