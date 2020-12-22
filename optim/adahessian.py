@@ -16,6 +16,7 @@ class AdaHessian(Optimizer):
         weight_decay (float, optional) -- weight decay (L2 penalty) (default: 0.0)
         hessian_power (float, optional) -- exponent of the hessian trace (default: 1.0)
         update_each (int, optional) -- compute the hessian trace approximation only after *this* number of steps (to save time) (default: 1)
+        num_threads (int, optional) -- number of threads for distributed training (default: 1)
     """
 
     def __init__(self, params, lr=0.1, betas=(0.9, 0.999), eps=1e-4, weight_decay=0.0,
@@ -64,7 +65,6 @@ class AdaHessian(Optimizer):
             if not isinstance(p.hess, float) and self.state[p]["hessian step"] % self.update_each == 0:
                 p.hess.zero_()
 
-    @torch.no_grad()
     def set_hessian(self):
         """
         Computes the Hutchinson approximation of the hessian trace and accumulates it for each trainable parameter.
@@ -91,7 +91,7 @@ class AdaHessian(Optimizer):
         hzs = torch.autograd.grad(grads, params, grad_outputs=zs, only_inputs=True, retain_graph=True)
 
         for hz, z, p in zip(hzs, zs, params):
-            hut_trace = hz * z  # approximate the expected values of z*(H@z)
+            hut_trace = (hz * z).contiguous()  # approximate the expected values of z*(H@z)
             if self.num_threads > 1:
                 dist.all_reduce(hut_trace)
                 hut_trace.div_(self.num_threads)
