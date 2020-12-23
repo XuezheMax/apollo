@@ -70,10 +70,10 @@ For the model training of image classification, please go to this [folder](https
 |  Method    |    lr      |  weight decay  |  decoupled weight decay |  eps    |  warmup updates  |  init_lr  |
 | :--------- | :--------: | :------------: | :---------------------: | :-----: | :--------------: | :-------: |
 |  SGD       |   0.1      |      1e-4      |         False           |   NA    |        0         |     NA    |
-|  Adam      |   0.001    |      1e-4      |         True            |  1e-8   |        0         |     NA    |
-|  RAdam     |   0.001    |      1e-4      |         True            |  1e-8   |        0         |     NA    |
-|  Adam-adj  |   0.001    |      1e-1      |         True            |  1e-8   |        0         |     NA    |
-|  RAdam-adj |   0.001    |      1e-1      |         True            |  1e-8   |        0         |     NA    |
+|  Adam*     |   0.001    |      1e-4      |         True            |  1e-8   |        0         |     NA    |
+|  RAdam*    |   0.001    |      1e-4      |         True            |  1e-8   |        0         |     NA    |
+|  Adam      |   0.001    |      1e-1      |         True            |  1e-8   |        0         |     NA    |
+|  RAdam     |   0.001    |      1e-1      |         True            |  1e-8   |        0         |     NA    |
 |  Apollo    |   1.0      |      1e-4      |         False           |  1e-4   |       200        |    0.01   |
 
 Note that decoupled weight decay is applied to both Adam and RAdam. 
@@ -133,7 +133,7 @@ Thus, as discussed in the paper, we suggest to consider the effect of regulariza
 
 - In this paper, for fair comparison, we comprehensively tune the `learning rate` and the `weight decay rate` for all the optimizers on CIFAR-10. 
 For ImageNet, due to the resource limits, we kept all the hyper-parameters selected from CIFAR-10 for each optimizer, and only tuned the `weight decay rate`.
-One motivation is to test the consistency of hyper-parameters of these optimizers on different tasks.
+One motivation of this is to test the consistency of hyper-parameters of these optimizers on different tasks.
 
 - We analyzed the effect of different `weight decay rates` on different optimizers. 
 As illustrated in the figure, Apollo achieves improvements over all the three baselines on convergence speed with different rates of weight decay
