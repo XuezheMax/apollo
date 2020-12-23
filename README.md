@@ -33,17 +33,18 @@ This is the Pytorch implementation for [Apollo: An Adaptive Parameter-wise Diago
 ## Experimental Results
 
 ### Image Classification
-<img src="./docs/images/classify.png" width="1000"/>
+<img src="./docs/images/classify_full.png" width="1000"/>
 
 | Method     |  CIFAR-10 (%)      |  CIFAR-10 (%)      |  ImageNet (%)      |  ImageNet (%)      |
 | :--------- | :----------------: | :----------------: | :----------------: | :----------------: |
 |            |  **milestone**     |  **cosine**        |  **milestone**     |  **cosine**        |
-| SGD        |  93.91 (0.07)      |  94.53 (0.27)      |  77.19 (0.07)      |  78.17 (0.06)      |
-| Adam       |  91.41 (0.30)      |  91.56 (0.19)      |  71.72 (0.13)      |  71.19 (0.10)      |
-| RAdam      |  91.80 (0.04)      |  91.88 (0.15)      |  72.37 (0.08)      |  71.64 (0.14)      |
-| Adam-adj   |  93.74 (0.15)      |  94.24 (0.09)      |  76.86 (0.06)      |  77.54 (0.16)      |
-| RAdam-adj  |  93.88 (0.11)      |  94.38 (0.25)      |  76.91 (0.07)      |  77.68 (0.08)      |
-| **Apollo** |  **94.20 (0.12)**  |  **94.60 (0.06)**  |  **77.90 (0.06)**  |  **78.54 (0.09)**  |
+| SGD        |  93.94 (0.07)      |  94.53 (0.27)      |  77.47 (0.07)      |  78.22 (0.08)      |
+| Adam*      |  91.41 (0.30)      |  91.56 (0.19)      |  71.72 (0.13)      |  71.19 (0.10)      |
+| RAdam*     |  91.80 (0.04)      |  91.88 (0.15)      |  72.37 (0.08)      |  71.64 (0.14)      |
+| Adam       |  93.74 (0.15)      |  94.24 (0.09)      |  76.86 (0.06)      |  77.54 (0.16)      |
+| RAdam      |  93.88 (0.11)      |  94.38 (0.25)      |  76.91 (0.07)      |  77.68 (0.08)      |
+| AdaHessian |  93.97 (0.22)      |  94.48 (0.17)      |   ---              |   ---              |
+| **Apollo** |  **94.21 (0.08)**  |  **94.64 (0.09)**  |  **77.85 (0.07)**  |  **78.45 (0.06)**  |
 
 We use [ResNet-110](https://github.com/bearpaw/pytorch-classification) for CIFAR-10 and standard ResNext-50 for ImageNet. 
 Note that ResNet-110 is a modified version of ResNet-18 to adapt the small image size ```32x32``` in CIFAR-10.
@@ -54,25 +55,26 @@ For the model training of image classification, please go to this [folder](https
 
 **ResNet-110 on CIFAR-10**
 
-|  Method    |    lr      |  weight decay  |  decoupled weight decay |  warmup updates  |  init_lr  |
-| :--------- | :--------: | :------------: | :---------------------: | :--------------: | :-------: |
-|  SGD       |   0.1      |      5e-4      |         False           |        0         |     NA    |
-|  Adam      |   0.001    |      5e-4      |         True            |        0         |     NA    |
-|  RAdam     |   0.001    |      5e-4      |         True            |        0         |     NA    |
-|  Adam-adj  |   0.001    |      2.5e-1    |         True            |        0         |     NA    |
-|  RAdam-adj |   0.001    |      2.5e-1    |         True            |        0         |     NA    |
-|  Apollo    |   0.5      |      5e-4      |         False           |       100        |    0.01   |
+|  Method    |    lr      |  weight decay  |  decoupled weight decay |  eps    | warmup updates  |  init_lr  |
+| :--------- | :--------: | :------------: | :---------------------: | :-----: | :--------------: | :-------: |
+|  SGD       |   0.1      |      5e-4      |         False           |   NA    |        0         |     NA    |
+|  Adam*     |   0.001    |      5e-4      |         True            |  1e-8   |        0         |     NA    |
+|  RAdam*    |   0.001    |      5e-4      |         True            |  1e-8   |        0         |     NA    |
+|  Adam      |   0.001    |      2.5e-1    |         True            |  1e-8   |        0         |     NA    |
+|  RAdam     |   0.001    |      2.5e-1    |         True            |  1e-8   |        0         |     NA    |
+|  AdaHessian|   0.15     |      1e-3      |         True            |  1e-2   |       200        |    0.001  |
+|  Apollo    |   1.0      |      2.5e-4    |         False           |  1e-4   |       200        |    0.01   |
 
 **ResNext-50 on ImageNet**
 
-|  Method    |    lr      |  weight decay  |  decoupled weight decay |  warmup updates  |  init_lr  |
-| :--------- | :--------: | :------------: | :---------------------: | :--------------: | :-------: |
-|  SGD       |   0.1      |      2e-4      |         False           |        0         |     NA    |
-|  Adam      |   0.001    |      2e-4      |         True            |        0         |     NA    |
-|  RAdam     |   0.001    |      2e-4      |         True            |        0         |     NA    |
-|  Adam-adj  |   0.001    |      1e-1      |         True            |        0         |     NA    |
-|  RAdam-adj |   0.001    |      1e-1      |         True            |        0         |     NA    |
-|  Apollo    |   0.5      |      2e-4      |         False           |       100        |    0.01   |
+|  Method    |    lr      |  weight decay  |  decoupled weight decay |  eps    |  warmup updates  |  init_lr  |
+| :--------- | :--------: | :------------: | :---------------------: | :-----: | :--------------: | :-------: |
+|  SGD       |   0.1      |      1e-4      |         False           |   NA    |        0         |     NA    |
+|  Adam      |   0.001    |      1e-4      |         True            |  1e-8   |        0         |     NA    |
+|  RAdam     |   0.001    |      1e-4      |         True            |  1e-8   |        0         |     NA    |
+|  Adam-adj  |   0.001    |      1e-1      |         True            |  1e-8   |        0         |     NA    |
+|  RAdam-adj |   0.001    |      1e-1      |         True            |  1e-8   |        0         |     NA    |
+|  Apollo    |   1.0      |      1e-4      |         False           |  1e-4   |       200        |    0.01   |
 
 Note that decoupled weight decay is applied to both Adam and RAdam. 
 To adjust the weight decay rates of Adam and RAdam, we multiply the original rate with ```500```, which is the ratio of ```lr_apollo / lr_adam```.
@@ -129,8 +131,9 @@ For the details of NMT experiments, please go to this [repo](https://github.com/
 Moreover, different implementations of `weight decay`, such as the decoupled version, lead to very different regularization strength with the same `weight decay rate`.
 Thus, as discussed in the paper, we suggest to consider the effect of regularization strength when we analyze the performance of different optimization methods.
 
-- In this paper, for fair comparison, we use the same `weight decay rate` for SGD and Apollo in the image classification task, since they use the same implementation of `weight decay`.
-For Adam and RAdam, since we used the decoupled version of `weight decay` (i.e., we actually used AdamW and RAdamW), we adjusted the `weight decay rate` so that they have similar strength of regularization. 
+- In this paper, for fair comparison, we comprehensively tune the `learning rate` and the `weight decay rate` for all the optimizers on CIFAR-10. 
+For ImageNet, due to the resource limits, we kept all the hyper-parameters selected from CIFAR-10 for each optimizer, and only tuned the `weight decay rate`.
+One motivation is to test the consistency of hyper-parameters of these optimizers on different tasks.
 
 - We analyzed the effect of different `weight decay rates` on different optimizers. 
 As illustrated in the figure, Apollo achieves improvements over all the three baselines on convergence speed with different rates of weight decay
