@@ -6,6 +6,7 @@ root_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(root_path)
 
 import signal
+import subprocess
 import threading
 from argparse import ArgumentParser
 import time
@@ -458,6 +459,9 @@ def slurm(args):
     dist_world_size = int(current_env['SLURM_NTASKS'])
     args.rank = int(current_env['SLURM_PROCID']) if dist_world_size > 1 else -1
     args.local_rank = int(current_env['SLURM_LOCALID'])
+
+    hostnames = subprocess.check_output(['scontrol', 'show', 'hostnames', current_env['SLURM_JOB_NODELIST']])
+    current_env['MASTER_ADDR'] = hostnames.decode('utf-8').split()[0]
 
     print('start process: rank={}({}), master addr={}, port={}, nnodes={}, world size={}'.format(
         args.rank, args.local_rank, current_env["MASTER_ADDR"], current_env["MASTER_PORT"], nnodes, dist_world_size))
