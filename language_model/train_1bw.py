@@ -18,7 +18,7 @@ from torch.optim.lr_scheduler import MultiStepLR
 
 from language_model.model_word_ada.lm import LM
 from language_model.model_word_ada.dataset import LargeDataset, EvalDataset
-from optim import RAdamW, Apollo, AdaHessian
+from optim import RAdamW, Apollo, AdaHessian, AdaBelief
 
 
 def logging(info, logfile=None):
@@ -35,6 +35,8 @@ def get_optimizer(opt, learning_rate, parameters, lr_decay, decay_rate, mileston
         optimizer = RAdamW(parameters, lr=learning_rate, betas=(0.9, 0.999), weight_decay=0.)
     elif opt == 'adam':
         optimizer = Adam(parameters, lr=learning_rate, betas=(0.9, 0.999), weight_decay=0.)
+    elif opt == 'adabelief':
+        optimizer = AdaBelief(parameters, lr=learning_rate, betas=(0.9, 0.999), eps=1e-12, weight_decay=0.)
     elif opt == 'apollo':
         optimizer = Apollo(parameters, lr=learning_rate, beta=0.9, eps=1e-4, rebound=rebound,
                            warmup=warmup_updates, init_lr=init_lr, weight_decay=0.)
@@ -87,7 +89,7 @@ if __name__ == "__main__":
     parser.add_argument('--epochs', type=int, default=14)
     parser.add_argument('--clip', type=float, default=0)
     parser.add_argument('--clip_mode', choices=['total', 'each'], default='total')
-    parser.add_argument('--opt', choices=['sgd', 'adam', 'radam', 'apollo', 'adahessian'], help='optimizer', required=True)
+    parser.add_argument('--opt', choices=['sgd', 'adam', 'radam', 'adabelief', 'apollo', 'adahessian'], help='optimizer', required=True)
     parser.add_argument('--rnn_unit', choices=['gru', 'lstm', 'rnn'], default='lstm')
     parser.add_argument('--lr', type=float, required=True)
     parser.add_argument('--lr_decay', choices=['milestone'], default='milestone', help='Decay rate of learning rate')
