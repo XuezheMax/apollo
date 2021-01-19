@@ -67,7 +67,7 @@ def evaluate(args, data_loader, lm_model):
     total_count = 0
     for word_t, label_t in iterator:
         word_t = word_t.to(device)
-        label_t = label_t.to(device).view(-1)
+        label_t = label_t.to(device).reshape(-1)
         count = label_t.size(0)
         loss, hx = lm_model(word_t, label_t, hx=hx)
         total_loss += count * loss.item()
@@ -205,7 +205,7 @@ if __name__ == "__main__":
                 hx = None
 
             word_t = word_t.to(device, non_blocking=True)
-            label_t = label_t.to(device, non_blocking=True).view(-1)
+            label_t = label_t.to(device, non_blocking=True).reshape(-1)
 
             loss, hx = lm_model(word_t, label_t, hx=hx)
             train_loss += loss.item()
