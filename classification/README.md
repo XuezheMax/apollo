@@ -27,11 +27,12 @@ python -u cifar.py --depth 110 --batch_size 128 --epochs 200 \
     --dataset cifar10 --data_path <data path> --model_path <model path> \
     --run <run_id> --seed <random seed> 
 ```
-### Adam & RAdam
+### Adam, RAdam & AdaBelief
 #### milestone decay
 ```base
 python -u cifar.py --depth 110 --batch_size 128 --epochs 164 \
-    --opt [adamw|radamw] --lr 0.001 --opt_h1 0.9 --opt_h2 0.999 --eps 1e-8 --weight_decay 2.5e-2 \
+    --opt [adamw|radamw|adabelief] --lr 0.001 --opt_h1 0.9 --opt_h2 0.999 --eps 1e-8 \
+    --weight_decay 2.5e-2 --weight_decay_type 'decoupled' \
     --lr_decay milestone --milestone 80 120 --decay_rate 0.1 \
     --dataset cifar10 --data_path <data path> --model_path <model path> \
     --run <run_id> --seed <random seed> 
@@ -39,7 +40,8 @@ python -u cifar.py --depth 110 --batch_size 128 --epochs 164 \
 #### cosine annealing
 ```base
 python -u cifar.py --depth 110 --batch_size 128 --epochs 200 \
-    --opt [adamw|radamw] --lr 0.001 --opt_h1 0.9 --opt_h2 0.999 --eps 1e-8 --weight_decay 2.5e-2 \
+    --opt [adamw|radamw|adabelief] --lr 0.001 --opt_h1 0.9 --opt_h2 0.999 --eps 1e-8 \
+    --weight_decay 2.5e-2 --weight_decay_type 'decoupled' \
     --lr_decay cosine --last_lr 1e-6 --decay_rate 0.1 \
     --dataset cifar10 --data_path <data path> --model_path <model path> \
     --run <run_id> --seed <random seed> 
@@ -49,7 +51,8 @@ For Adam* & RAdam*, change `--weight_decay` from `2.5e-2` to `5e-4`.
 #### milestone decay
 ```base
 python -u cifar.py --depth 110 --batch_size 128 --epochs 164 \
-    --opt apollo --lr 1.0 --opt_h1 0.9 --eps 1e-4 --weight_decay 2.5e-4 \
+    --opt apollo --lr 1.0 --opt_h1 0.9 --eps 1e-4 \
+    --weight_decay 2.5e-4 --weight_decay_type ['L2'|'decoupled'] \
     --lr_decay milestone --milestone 80 120 --decay_rate 0.1 \
     --warmup_updates 200 --init_lr 0.01 \
     --dataset cifar10 --data_path <data path> --model_path <model path> \
@@ -58,7 +61,8 @@ python -u cifar.py --depth 110 --batch_size 128 --epochs 164 \
 #### cosine annealing
 ```base
 python -u cifar.py --depth 110 --batch_size 128 --epochs 200 \
-    --opt apollo --lr 1.0 --opt_h1 0.9 --eps 1e-4 --weight_decay 2.5e-4 \
+    --opt apollo --lr 1.0 --opt_h1 0.9 --eps 1e-4 \
+    --weight_decay 2.5e-4 --weight_decay_type ['L2'|'decoupled'] \
     --lr_decay cosine --last_lr 0.001 --decay_rate 0.1 \
     --warmup_updates 200 --init_lr 0.01 \
     --dataset cifar10 --data_path <data path> --model_path <model path> \
@@ -87,12 +91,13 @@ python -u imagenet.py --nproc_per_node 8 --master_addr <ip addr> --master_port <
     --data_path <data path> --model_path <model path> \
     --run <run_id> --seed <random seed> 
 ```
-### Adam & RAdam
+### Adam, RAdam & AdaBelief
 #### milestone decay
 ```base
 python -u imagenet.py --nproc_per_node 8 --master_addr <ip addr> --master_port <port> \
     --arch resnext50 --batch_size 256 --epochs 120 \
-    --opt [adamw|radamw] --lr 0.001 --opt_h1 0.9 --opt_h2 0.999 --eps 1e-8 --weight_decay 1e-1 \
+    --opt [adamw|radamw|adabelief] --lr 0.001 --opt_h1 0.9 --opt_h2 0.999 --eps 1e-8 \
+    --weight_decay 1e-1 --weight_decay_type 'decoupled' \
     --lr_decay milestone --milestone 40 80 --decay_rate 0.1 \
     --data_path <data path> --model_path <model path> \
     --run <run_id> --seed <random seed> 
@@ -101,7 +106,8 @@ python -u imagenet.py --nproc_per_node 8 --master_addr <ip addr> --master_port <
 ```base
 python -u imagenet.py --nproc_per_node 8 --master_addr <ip addr> --master_port <port> \
     --arch resnext50 --batch_size 256 --epochs 120 \
-    --opt [adamw|radamw] --lr 0.001 --opt_h1 0.9 --opt_h2 0.999 --eps 1e-8 --weight_decay 1e-1 \
+    --opt [adamw|radamw|adabelief] --lr 0.001 --opt_h1 0.9 --opt_h2 0.999 --eps 1e-8 \
+    --weight_decay 1e-1 --weight_decay_type 'decoupled' \
     --lr_decay cosine --last_lr 1e-6 --decay_rate 0.1 \
     --data_path <data path> --model_path <model path> \
     --run <run_id> --seed <random seed> 
@@ -112,7 +118,8 @@ For Adam* & RAdam*, change `--weight_decay` from `1e-1` to `1e-4`.
 ```base
 python -u imagenet.py --nproc_per_node 8 --master_addr <ip addr> --master_port <port> \
     --arch resnext50 --batch_size 256 --epochs 120 \
-    --opt apollo --lr 1.0 --opt_h1 0.9 --eps 1e-4 --weight_decay 1e-4 \
+    --opt apollo --lr 1.0 --opt_h1 0.9 --eps 1e-4 \
+    --weight_decay 1e-4 --weight_decay_type ['L2'|'decoupled'] \
     --lr_decay milestone --milestone 40 80 --decay_rate 0.1 \
     --warmup_updates 200 --init_lr 0.01 \
     --data_path <data path> --model_path <model path> \
@@ -122,7 +129,8 @@ python -u imagenet.py --nproc_per_node 8 --master_addr <ip addr> --master_port <
 ```base
 python -u imagenet.py --nproc_per_node 8 --master_addr <ip addr> --master_port <port> \
     --arch resnext50 --batch_size 256 --epochs 120 \
-    --opt apollo --lr 1.0 --opt_h1 0.9 --eps 1e-4 --weight_decay 1e-4 \
+    --opt apollo --lr 1.0 --opt_h1 0.9 --eps 1e-4 \
+    --weight_decay 1e-4 --weight_decay_type ['L2'|'decoupled'] \
     --lr_decay cosine --last_lr 0.001 --decay_rate 0.1 \
     --warmup_updates 200 --init_lr 0.01 \
     --data_path <data path> --model_path <model path> \
