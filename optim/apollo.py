@@ -14,14 +14,14 @@ class Apollo(Optimizer):
             eps (float, optional): term added to the denominator to improve numerical stability (default: 1e-4)
             rebound (str, optional): recified bound for diagonal hessian:
                 ``'constant'`` | ``'belief'`` (default: None)
-            warmup (int, optional): number of warmup steps (default: 100)
-            init_lr (float, optional): initial learning rate for warmup (default: 0.01)
+            warmup (int, optional): number of warmup steps (default: 500)
+            init_lr (float, optional): initial learning rate for warmup (default: lr/1000)
             weight_decay (float, optional): weight decay coefficient (default: 0)
             weight_decay_type (str, optional): type of weight decay:
                 ``'L2'`` | ``'decoupled'`` | ``'stable'`` (default: 'L2')
         """
 
-    def __init__(self, params, lr, beta=0.9, eps=1e-4, rebound='constant', warmup=100, init_lr=0.01, weight_decay=0, weight_decay_type=None):
+    def __init__(self, params, lr, beta=0.9, eps=1e-4, rebound='constant', warmup=500, init_lr=None, weight_decay=0, weight_decay_type=None):
         if not 0.0 < lr:
             raise ValueError("Invalid learning rate value: {}".format(lr))
         if not 0.0 <= eps:
@@ -32,6 +32,8 @@ class Apollo(Optimizer):
             raise ValueError("Invalid recitifed bound: {}".format(rebound))
         if not 0.0 <= warmup:
             raise ValueError("Invalid warmup updates: {}".format(warmup))
+        if init_lr is None:
+            init_lr = lr / 1000
         if not 0.0 <= init_lr <= lr:
             raise ValueError("Invalid initial learning rate: {}".format(init_lr))
         if not 0.0 <= weight_decay:
@@ -94,6 +96,7 @@ class Apollo(Optimizer):
                     grad = grad.add(p, alpha=group['weight_decay'])
 
                 beta = group['beta']
+                eps = group['eps']
                 exp_avg_grad = state['exp_avg_grad']
                 B = state['approx_hessian']
                 d_p = state['update']
@@ -107,12 +110,13 @@ class Apollo(Optimizer):
                 if group['rebound'] == 'belief':
                     rebound = delta_grad.norm(p=np.inf)
                 else:
-                    rebound = 1.0
+                    rebound = 0.01
+                    eps = eps / rebound
 
                 # Update the running average grad
                 exp_avg_grad.add_(delta_grad, alpha=alpha)
 
-                denom = d_p.norm(p=4).add(group['eps'])
+                denom = d_p.norm(p=4).add(eps)
                 d_p.div_(denom)
                 v_sq = d_p.mul(d_p)
                 delta = delta_grad.div_(denom).mul_(d_p).sum().mul(-alpha) - B.mul(v_sq).sum()
@@ -122,7 +126,7 @@ class Apollo(Optimizer):
 
                 # calc direction of parameter updates
                 if group['rebound'] == 'belief':
-                    denom = torch.max(B.abs(), rebound).add_(group['eps'] / alpha)
+                    denom = torch.max(B.abs(), rebound).add_(eps / alpha)
                 else:
                     denom = B.abs().clamp_(min=rebound)
 

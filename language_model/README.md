@@ -20,7 +20,7 @@ python -u train_1bw.py --dataset_folder <data_folder> --epochs 20 \
 ### Apollo
 ```base
 python -u train_1bw.py --dataset_folder <data_folder> --epochs 20 \
-    --opt apollo --lr 10.0 --milestone 12 18 --clip 1.0 \
-    --warmup_updates 400 --init_lr 0.01 \
+    --opt apollo --lr 0.1 --milestone 12 18 --clip 1.0 \
+    --warmup_updates 500 --init_lr 1e-5 \
     --model_path <model path> --run <run_id> --seed <random seed> 
 ```

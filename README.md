@@ -27,7 +27,8 @@ This is the Pytorch implementation for [Apollo: An Adaptive Parameter-wise Diago
 2. Install [Pytorch and torchvision](https://pytorch.org/get-started/locally/)
 
 ## Notes
-- The ranges of hyper parameters of Apollo, such as learning rate, are very different with Adam (see the appendix of the paper for details). To apply Apollo to your tasks, a reasonable set of hyper parameters to begin with is ```lr=1.0, eps=1e-4, init_lr=0.01, warmup=100```.
+- In the latest version of **Apollo**, we changed `sigma` from `1.0` to `0.01` to make its learning rate in a suitable range, not that different with previous algorithms (see out [paper](https://arxiv.org/abs/2009.13586) for details). 
+To apply Apollo to your tasks, a reasonable set of hyper parameters to begin with is ```lr=0.01, eps=1e-4, init_lr=1e-5, warmup=500```.
 - Warmup plays a super important role for Apollo. Please set warmup to at least `100` updates to achieve stable convergence.
 
 ## Experimental Results
@@ -44,7 +45,7 @@ This is the Pytorch implementation for [Apollo: An Adaptive Parameter-wise Diago
 | Adam       |  93.74 (0.15)      |  94.24 (0.09)      |  76.86 (0.06)      |  77.54 (0.16)      |
 | RAdam      |  93.88 (0.11)      |  94.38 (0.25)      |  76.91 (0.07)      |  77.68 (0.08)      |
 | AdaBelief  |  94.03 (0.11)      |  94.51 (0.07)      |  77.55 (0.07)      |  78.22 (0.11)      |
-| AdaHessian |  93.97 (0.22)      |  94.48 (0.17)      |   ---              |   ---              |
+| AdaHessian |  93.97 (0.22)      |  94.48 (0.17)      |  77.61 (0.09)      |  78.02 (0.10)      |
 | **Apollo** |  **94.21 (0.08)**  |  **94.64 (0.09)**  |  **77.85 (0.07)**  |  **78.45 (0.06)**  |
 | **ApolloW**|  **94.34 (0.12)**  |  **94.76 (0.07)**  |  **77.86 (0.09)**  |  **78.48 (0.07)**  |
 
@@ -65,9 +66,9 @@ For the model training of image classification, please go to this [folder](https
 |  Adam      |   0.001    |      2.5e-1    |         True            |  1e-8   |        0         |     NA    |
 |  RAdam     |   0.001    |      2.5e-1    |         True            |  1e-8   |        0         |     NA    |
 |  AdaBeleif |   0.001    |      2.5e-1    |         True            |  1e-8   |        0         |     NA    |
-|  AdaHessian|   0.15     |      1e-3      |         True            |  1e-2   |       200        |    0.001  |
-|  Apollo    |   1.0      |      2.5e-4    |         False           |  1e-4   |       200        |    0.01   |
-|  Apollow   |   1.0      |      2.5e-4    |         True            |  1e-4   |       200        |    0.01   |
+|  AdaHessian|   0.15     |      1e-3      |         True            |  1e-2   |       500        |    1e-3   |
+|  Apollo    |   0.01     |      2.5e-4    |         False           |  1e-4   |       500        |    1e-5   |
+|  Apollow   |   0.01     |      2.5e-2    |         True            |  1e-4   |       500        |    1e-5   |
 
 **ResNext-50 on ImageNet**
 
@@ -79,8 +80,9 @@ For the model training of image classification, please go to this [folder](https
 |  Adam      |   0.001    |      1e-1      |         True            |  1e-8   |        0         |     NA    |
 |  RAdam     |   0.001    |      1e-1      |         True            |  1e-8   |        0         |     NA    |
 |  Adabelief |   0.001    |      1e-1      |         True            |  1e-8   |        0         |     NA    |
-|  Apollo    |   1.0      |      1e-4      |         False           |  1e-4   |       200        |    0.01   |
-|  ApolloW   |   1.0      |      1e-4      |         True            |  1e-4   |       200        |    0.01   |
+|  AdaHessian|   0.15     |      1e-3      |         True            |  1e-2   |       500        |    1e-3   |
+|  Apollo    |   0.01     |      1e-4      |         False           |  1e-4   |       500        |    1e-5   |
+|  ApolloW   |   0.01     |      1e-2      |         True            |  1e-4   |       500        |    1e-5   |
 
 Note that decoupled weight decay is applied to Adam, RAdam and AdaBelief. 
 
@@ -108,7 +110,7 @@ For the model training of language modeling, please go to this [folder](https://
 |  Adam      |   0.001    |      0         |         True            |  1e-8   |        0         |     NA    |      1.0        |
 |  RAdam     |   0.001    |      0         |         True            |  1e-8   |        0         |     NA    |      1.0        |
 |  AdaBelief |   0.001    |      0         |         True            |  1e-12  |        0         |     NA    |      1.0        |
-|  Apollo    |   10.0     |      0         |         False           |  1e-4   |       400        |    0.01   |      1.0        |
+|  Apollo    |   0.1      |      0         |         False           |  1e-4   |       500        |    1e-5   |      1.0        |
 
 Since the weight decay rate is zero for all the optimizers, there is no difference between standard L2 regularization and decoupled weight decay.
 
@@ -124,7 +126,7 @@ Since the weight decay rate is zero for all the optimizers, there is no differen
 
 We use the Transformer-base models.
 Some key hyper-parameters are listed in the following table.
-For the details of NMT experiments, please go to this [repo](https://github.com/XuezheMax/fairseq-apollo).
+For the details of NMT experiments, please go to this [repo](https://github.com/XuezheMax/fairseq-apollo/tree/apollo).
 
 **Transformer-base on WMT-14 En-De**
 
@@ -134,7 +136,7 @@ For the details of NMT experiments, please go to this [repo](https://github.com/
 |  Adam      |   0.0005   |      1e-4      |         True            |   1e-8  |    inverse sqrt     |       4000       |    1e-7   |      1.0        |
 |  RAdam     |   0.0005   |      1e-4      |         True            |   1e-8  |      milestone      |        0         |     NA    |      1.0        |
 |  AdaBelief |   0.0005   |      1e-4      |         True            |  1e-16  |      milestone      |       1000       |    1e-7   |      1.0        |
-|  Apollo    |   10.0     |      1e-8      |         False           |   1e-4  |      milestone      |       1000       |    0.01   |      1.0        |
+|  Apollo    |   0.1      |      1e-8      |         False           |   1e-4  |      milestone      |       1000       |    1e-5   |      1.0        |
 
 ## Discussion
 **1. Weight Decay:**
@@ -143,7 +145,6 @@ For the details of NMT experiments, please go to this [repo](https://github.com/
 Thus, as discussed in the paper, we suggest to consider the effect of regularization strength when we analyze the performance of different optimization methods.
 
 - For adaptive optimizers, including Adam, RAdam and AdaBelief, different implementations of `weight decay`, such as the decoupled version, lead to very different regularization strength with the same `weight decay rate`.
-Interestingly, Apollo is much more consistent with different implementations of `weight decay` (Apollo and ApolloW achieves similar performance with the same hyper-parameters).
 
 - In this paper, for fair comparison, we comprehensively tune the `learning rate` and the `weight decay rate` for all the optimizers on CIFAR-10. 
 For ImageNet, due to the resource limits, we kept all the hyper-parameters selected from CIFAR-10 for each optimizer, and only tuned the `weight decay rate`.
