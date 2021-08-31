@@ -101,20 +101,28 @@ class Apollo(Optimizer):
                 B = state['approx_hessian']
                 d_p = state['update']
 
+                steps = state['step']
+                beta_steps = beta ** steps
+                if state['step'] == 0:
+                    bias_correction_delta = 0.
+                else:
+                    bias_correction_delta = (1 - beta) * (1 - beta_steps) / (1 - beta_steps - (1 - beta) * steps * beta_steps)
+
                 state['step'] += 1
-                bias_correction = 1 - beta ** state['step']
-                alpha = (1 - beta) / bias_correction
+                bias_correction_grad = (1 - beta) / (1 - beta ** state['step'])
 
                 # calc the diff grad
-                delta_grad = exp_avg_grad - grad
+                delta_grad = grad - exp_avg_grad
+
+                # Update the running average grad
+                exp_avg_grad.add_(delta_grad, alpha=bias_correction_grad)
+
+                delta_grad.mul_(-bias_correction_delta)
                 if group['rebound'] == 'belief':
                     rebound = delta_grad.norm(p=np.inf)
                 else:
                     rebound = 0.01
                     eps = eps / rebound
-
-                # Update the running average grad
-                exp_avg_grad.add_(delta_grad, alpha=-alpha)
 
                 denom = d_p.norm(p=4).add(eps)
                 d_p.div_(denom)
