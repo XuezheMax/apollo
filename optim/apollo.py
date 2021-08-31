@@ -106,7 +106,7 @@ class Apollo(Optimizer):
                 alpha = (1 - beta) / bias_correction
 
                 # calc the diff grad
-                delta_grad = (exp_avg_grad - grad) * alpha
+                delta_grad = grad - exp_avg_grad
                 if group['rebound'] == 'belief':
                     rebound = delta_grad.norm(p=np.inf)
                 else:
@@ -114,7 +114,7 @@ class Apollo(Optimizer):
                     eps = eps / rebound
 
                 # Update the running average grad
-                exp_avg_grad.sub_(delta_grad)
+                exp_avg_grad.add_(delta_grad, alpha=alpha)
 
                 denom = d_p.norm(p=4).add(eps)
                 d_p.div_(denom)
