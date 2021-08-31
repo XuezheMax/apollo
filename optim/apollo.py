@@ -104,7 +104,7 @@ class Apollo(Optimizer):
                 steps = state['step']
                 beta_steps = beta ** steps
                 if state['step'] == 0:
-                    bias_correction_delta = 0.
+                    bias_correction_delta = 1.0
                 else:
                     bias_correction_delta = (1 - beta) * (1 - beta_steps) / (1 - beta_steps - (1 - beta) * steps * beta_steps)
 
