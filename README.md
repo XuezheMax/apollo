@@ -126,7 +126,7 @@ Since the weight decay rate is zero for all the optimizers, there is no differen
 
 We use the Transformer-base models.
 Some key hyper-parameters are listed in the following table.
-For the details of NMT experiments, please go to this [repo](https://github.com/XuezheMax/fairseq-apollo/tree/apollo).
+For the details of NMT experiments, please go to this [repo](https://github.com/XuezheMax/fairseq-apollo).
 
 **Transformer-base on WMT-14 En-De**
 
